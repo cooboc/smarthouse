@@ -1,0 +1,6 @@
+{
+    "C_Cpp.loggingLevel": "Debug",
+    "files.associations": {
+        "cstdint": "cpp"
+    }
+}

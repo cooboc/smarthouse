@@ -78,8 +78,8 @@ void setup()
 void loop()
 {
     unsigned long long t = millis();
-    t %= length;
-    if (t < 50)
+    t %= 1000;
+    if (t < 500)
     {
         digitalWrite(LED_BUILTIN, LOW);
     }
