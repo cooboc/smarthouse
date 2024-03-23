@@ -1,0 +1,67 @@
+{
+    "version": 4,
+    "configurations": [
+        {
+            "name": "Arduino",
+            "compilerPath": "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\3.1.0-gcc10.3-e5f9fec\\bin\\xtensa-lx106-elf-g++",
+            //"compilerPath": "@C:\\Users\\heqichen\\Documents\\Arduino\\hardware\\esp8266com\\esp8266\\tools\\warnings\\none-g++",
+            "compilerArgs": [
+                "-U__STRICT_ANSI__",
+                "-Os",
+                "-g",
+                "-free",
+                "-fipa-pta",
+                "-Werror=return-type",
+                "-mlongcalls",
+                "-mtext-section-literals",
+                "-fno-rtti",
+                "-falign-functions=4",
+                "-std=gnu++17",
+                "-MMD",
+                "-ffunction-sections",
+                "-fdata-sections",
+                "-fno-exceptions"
+            ],
+            "intelliSenseMode": "gcc-x64",
+            "includePath": [
+                "${workspaceFolder}",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\tools\\sdk\\include",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\tools\\sdk\\lwip2\\include",
+                //"C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\tools\\sdk\\libc\\xtensa-lx106-elf\\include",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\3.1.0-gcc10.3-e5f9fec\\include",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\cores\\esp8266",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\variants\\generic",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\ESP8266WiFi\\src",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\ESP8266mDNS\\src",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\ArduinoOTA"
+            ],
+            "forcedInclude": [
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\cores\\esp8266\\Arduino.h"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "defines": [
+                "__ets__",
+                "ICACHE_FLASH",
+                "_GNU_SOURCE",
+                "ESP8266",
+                "MMU_IRAM_SIZE=0x8000",
+                "MMU_ICACHE_SIZE=0x8000",
+                "NONOSDK22x_190703=1",
+                "F_CPU=160000000L",
+                "LWIP_OPEN_SRC",
+                "TCP_MSS=536",
+                "LWIP_FEATURES=1",
+                "LWIP_IPV6=0",
+                "ARDUINO=10607",
+                "ARDUINO_ESP8266_GENERIC",
+                "ARDUINO_ARCH_ESP8266",
+                "ARDUINO_BOARD=\"ESP8266_GENERIC\"",
+                "ARDUINO_BOARD_ID=\"generic\"",
+                "LED_BUILTIN=1",
+                "FLASHMODE_DOUT",
+                "USBCON"
+            ]
+        }
+    ]
+}

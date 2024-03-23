@@ -1,0 +1,2 @@
+compile: 
+arduino-cli compile --verbose --build-cache-path .cache --build-path .cache --fqbn esp8266:esp8266:generic poc\\01-ota\\BasicOTA
