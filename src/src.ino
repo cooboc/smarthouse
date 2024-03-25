@@ -6,7 +6,7 @@
 
 cooboc::Configuration configuration{};
 cooboc::WifiHandler wifiHandler{};
-cooboc::StateMachine sm{configuration};
+cooboc::StateMachine sm{configuration, wifiHandler};
 
 void setup()
 {

@@ -2,5 +2,12 @@
     "C_Cpp.loggingLevel": "Debug",
     "files.associations": {
         "cstdint": "cpp"
+    },
+    "C_Cpp.clang_format_fallbackStyle": "LLVM",
+    "editor.formatOnSave": true,
+    "C_Cpp.files.exclude": {
+        "**/.vscode": true,
+        "**/.vs": true,
+        "**/.cache": true,
     }
 }
