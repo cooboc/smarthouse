@@ -18,12 +18,12 @@ StateMachine::StateMachine(const Configuration &configuration,
 void StateMachine::begin() { transitTo(State::CONNECTING); }
 
 void StateMachine::tick() {
+  const WifiHandler::WifiStatus wifiStatus = wifi_.getWifiStatus();
   switch (state_) {
   case (State::FAILSAFE): {
     break;
   }
   case (State::CONNECTING): {
-    const WifiHandler::WifiStatus wifiStatus = wifi_.getWifiStatus();
     switch (wifiStatus) {
     case (WifiHandler::WifiStatus::CONNECTING): {
       // Do nothing
@@ -31,24 +31,23 @@ void StateMachine::tick() {
     }
     case (WifiHandler::WifiStatus::CONNECTED): {
       transitOut();
-      transitTo(State::WORKING_STANDALONE);
-      wifi_.getWifiStatus();
+      transitTo(State::WORKING_WITH_WIFI);
       break;
     }
     default: {
       Serial.println("TODO, handle error status");
       // TOOD: error status code
+      // delay 2s to avoid connecting flood while AP is off
       break;
     }
     }
 
     break;
   }
-  case (State::WORKING_STANDALONE): {
-    static unsigned long lastPrintTime = millis();
-    if (millis() - lastPrintTime > 1000U) {
-      Serial.println("working");
-      lastPrintTime = millis();
+  case (State::WORKING_WITH_WIFI): {
+    if (wifiStatus != WifiHandler::WifiStatus::CONNECTED) {
+      transitOut();
+      transitTo(State::CONNECTING);
     }
     break;
   }
@@ -73,7 +72,7 @@ void StateMachine::transitTo(State newState) {
     Serial.print("Connecting");
     break;
   }
-  case (State::WORKING_STANDALONE): {
+  case (State::WORKING_WITH_WIFI): {
     Serial.println("TODO switch to WORKING_STANDALONE, connect server");
     break;
   }
