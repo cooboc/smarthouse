@@ -12,15 +12,27 @@ namespace cooboc {
 // It may cause undefined behaviour. To avoid this situation, I have to make
 // this compromise. Move all initialization code to begin() function.
 StateMachine::StateMachine(const Configuration &configuration,
-                           const WifiHandler &wifi)
+                           WifiHandler &wifi)
     : configuration_(configuration), wifi_(wifi) {}
 
-void StateMachine::begin() { transitTo(State::CONNECTING); }
+void StateMachine::begin() {
+  Serial.println("begin state machine");
+
+  if (configuration_.isWifiCredentialExists()) {
+    transitTo(State::CONNECTING);
+  } else {
+    transitTo(State::CONFIG_PORTAL);
+  }
+}
 
 void StateMachine::tick() {
+  wifi_.tick();
   const WifiHandler::WifiStatus wifiStatus = wifi_.getWifiStatus();
   switch (state_) {
   case (State::FAILSAFE): {
+    break;
+  }
+  case (State::CONFIG_PORTAL): {
     break;
   }
   case (State::CONNECTING): {
@@ -62,8 +74,13 @@ void StateMachine::transitTo(State newState) {
   state_ = newState;
   switch (state_) {
   case (State::FAILSAFE): {
+    Serial.println("FAILSAFE");
     while (true)
       ;
+    break;
+  }
+  case (State::CONFIG_PORTAL): {
+    wifi_.startWebPortal();
     break;
   }
   case (State::CONNECTING): {

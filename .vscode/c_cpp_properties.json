@@ -33,6 +33,8 @@
                 "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\variants\\generic",
                 "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\ESP8266WiFi\\src",
                 "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\ESP8266mDNS\\src",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\DNSServer\\src",
+                "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\ESP8266WebServer\\src",
                 "C:\\Users\\heqichen\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\ArduinoOTA"
             ],
             "forcedInclude": [

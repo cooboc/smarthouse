@@ -10,18 +10,20 @@ class StateMachine {
 public:
   enum class State : std::uint8_t {
     FAILSAFE,
-    WORKING_WITH_WIFI,
+    CONFIG_PORTAL,
     CONNECTING,
+    WORKING_WITH_WIFI,
+
   };
 
-  StateMachine(const Configuration &configruation, const WifiHandler &wifi);
+  StateMachine(const Configuration &configruation, WifiHandler &wifi);
   void begin();
   void tick();
 
 private:
   State state_{State::CONNECTING};
   const Configuration &configuration_;
-  const WifiHandler &wifi_;
+  WifiHandler &wifi_;
 
   void transitOut();
   void transitTo(State newState);

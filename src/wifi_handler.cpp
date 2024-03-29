@@ -1,7 +1,13 @@
 #include "wifi_handler.h"
+#include "data_def.h"
 
 namespace cooboc {
-WifiHandler::WifiHandler() {}
+
+namespace {} // namespace
+
+WifiHandler::WifiHandler(const Configuration &configuration)
+    : configuration_(configuration), webPortal_{configuration},
+      isWebPortalStarted_{false} {}
 
 void WifiHandler::startConnectAp(const char *ssid, const char *password) const {
   // TODO need to check current status, stop current status
@@ -40,6 +46,28 @@ WifiHandler::WifiStatus WifiHandler::getWifiStatus() const {
     Serial.println((int)(status));
     delay(100);
     return WifiStatus::UNKNOWN;
+  }
+}
+
+void WifiHandler::startWebPortal() {
+  Serial.println("ready to start web portal");
+  Serial.print("AP name");
+  Serial.print(strlen(configuration_.getSelfAPName()));
+  Serial.print(" :");
+  Serial.println(configuration_.getSelfAPName());
+
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(MY_IP, MY_IP, SUBNET_MASK);
+  WiFi.softAP(configuration_.getSelfAPName());
+
+  webPortal_.begin();
+
+  isWebPortalStarted_ = true;
+}
+
+void WifiHandler::tick() {
+  if (isWebPortalStarted_) {
+    webPortal_.tick();
   }
 }
 
