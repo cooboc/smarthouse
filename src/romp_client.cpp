@@ -4,7 +4,9 @@
 namespace cooboc {
 
 RompClient::RompClient(const Configuration &configuration)
-    : configuration_{configuration}, socketClient_{nullptr} {}
+    : configuration_{configuration}, socketClient_{nullptr},
+      status_{Status::IDLE}, lastHeartbeatTime_{0UL} {}
+
 void RompClient::begin() {
   socketClient_ = new AsyncClient();
   socketClient_->setAckTimeout(400U);
@@ -20,13 +22,26 @@ void RompClient::begin() {
   //   socketClient_->onTimeout(onTimeoutCallback, this);
   //   socketClient_->onPoll(onPollCallback, this);
   socketClient_->connect(configuration_.getServerAddr(), 8113);
+  status_ = Status::CONNECTING;
+
   Serial.print("ready to connect server: ");
   Serial.print(configuration_.getServerAddr());
   Serial.println(":8113");
 }
+
+void RompClient::tick() {
+  if (status_ == Status::CONNECTED) {
+    if (millis() - lastHeartbeatTime_ > 1000UL) {
+      lastHeartbeatTime_ = millis();
+      socketClient_->write("Hello world!", std::strlen("Hello world!"));
+    }
+  }
+}
+
 void RompClient::end() {}
 
 void RompClient::onSocketConnected(void) {
+  status_ = Status::CONNECTED;
   Serial.println("connected to server");
 }
 

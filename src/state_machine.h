@@ -30,6 +30,8 @@ private:
 
   void transitOut();
   void transitTo(State newState);
+
+  void handleConnectingTick(const WifiHandler::WifiStatus wifiStatus);
 };
 
 } // namespace cooboc

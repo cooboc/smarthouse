@@ -37,30 +37,15 @@ void StateMachine::tick() {
     break;
   }
   case (State::CONNECTING): {
-    switch (wifiStatus) {
-    case (WifiHandler::WifiStatus::CONNECTING): {
-      // Do nothing
-      break;
-    }
-    case (WifiHandler::WifiStatus::CONNECTED): {
-      transitOut();
-      transitTo(State::WORKING_WITH_WIFI);
-      break;
-    }
-    default: {
-      Serial.println("TODO, handle error status");
-      // TOOD: error status code
-      // delay 2s to avoid connecting flood while AP is off
-      break;
-    }
-    }
-
+    handleConnectingTick(wifiStatus);
     break;
   }
   case (State::WORKING_WITH_WIFI): {
     if (wifiStatus != WifiHandler::WifiStatus::CONNECTED) {
       transitOut();
       transitTo(State::CONNECTING);
+    } else {
+      rompClient_.tick();
     }
     break;
   }
@@ -108,6 +93,27 @@ void StateMachine::transitTo(State newState) {
   default: {
     // TODO: LOG an error
     transitTo(State::FAILSAFE);
+    break;
+  }
+  }
+}
+
+void StateMachine::handleConnectingTick(
+    const WifiHandler::WifiStatus wifiStatus) {
+  switch (wifiStatus) {
+  case (WifiHandler::WifiStatus::CONNECTING): {
+    // Do nothing
+    break;
+  }
+  case (WifiHandler::WifiStatus::CONNECTED): {
+    transitOut();
+    transitTo(State::WORKING_WITH_WIFI);
+    break;
+  }
+  default: {
+    Serial.println("TODO, handle error status");
+    // TOOD: error status code
+    // delay 2s to avoid connecting flood while AP is off
     break;
   }
   }
