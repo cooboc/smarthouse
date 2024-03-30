@@ -28,6 +28,7 @@ void makePrintableId(std::uint32_t id, char buf[7]) {
   }
   buf[6] = '\0';
 }
+constexpr std::size_t PERSISTENT_LENGTH = sizeof(Persistent);
 
 } // namespace
 
@@ -50,6 +51,12 @@ void Configuration::begin() {
     Serial.println("first start, reset persistent.");
     persistent_.reset();
     writeToEEPROM();
+  } else {
+    Serial.println("EEPROM good!");
+    Serial.print("wifi in persistent: ");
+    Serial.print(persistent_.wifiSsid);
+    Serial.print(", crc=");
+    Serial.println(persistent_.crc);
   }
 
   // TODO: CHANGEME
@@ -60,29 +67,34 @@ void Configuration::begin() {
 }
 
 bool Configuration::readFromEEPROM() {
-  bool result = true;
-  constexpr std::size_t PERSISTENT_LENGTH = sizeof(Persistent);
-  EEPROM.begin(sizeof(PERSISTENT_LENGTH));
+  EEPROM.begin(PERSISTENT_LENGTH);
   std::uint8_t *targetAddr = (std::uint8_t *)(&persistent_);
   for (std::size_t i{0U}; i < PERSISTENT_LENGTH; ++i) {
-    *(targetAddr + 1) = EEPROM.read(i);
+    targetAddr[i] = EEPROM.read(i);
   }
+  EEPROM.end();
   std::uint16_t readoutCrc = persistent_.crc;
   persistent_.crc = 0;
   std::uint16_t expectCrc = calculateCrc(targetAddr, PERSISTENT_LENGTH);
+  Serial.print("Readout crc: ");
+  Serial.print(readoutCrc);
+  Serial.print(" ,expect CRC: ");
+  Serial.println(expectCrc);
   return expectCrc == readoutCrc;
 }
 
 void Configuration::writeToEEPROM() {
-  constexpr std::size_t PERSISTENT_LENGTH = sizeof(Persistent);
   std::uint8_t *targetAddr = (std::uint8_t *)(&persistent_);
   persistent_.crc = 0U;
   std::uint16_t crc = calculateCrc(targetAddr, PERSISTENT_LENGTH);
   persistent_.crc = crc;
+  EEPROM.begin(PERSISTENT_LENGTH);
   for (std::size_t i{0U}; i < PERSISTENT_LENGTH; ++i) {
     EEPROM.write(i, targetAddr[i]);
   }
-  EEPROM.commit();
+  bool success = EEPROM.commit();
+  EEPROM.end();
+  Serial.println(success ? "Update EEPROM successful" : "Update EEPROM failed");
 }
 
 void Configuration::debugPrintGears() {
@@ -115,5 +127,29 @@ void Configuration::getGearNameListString(char *buf) const {
     iter++;
   }
 }
+
+void Configuration::updateConfiguration(const char *ssid, const char *password,
+                                        const char *serverAddr, const int id) {
+  std::strcpy(persistent_.wifiSsid, ssid);
+  std::strcpy(persistent_.wifiPassword, password);
+  std::strcpy(persistent_.serverAddr, serverAddr);
+  persistent_.gearTypeId = id;
+  writeToEEPROM();
+}
+
+void Configuration::updateWifiSsid(const char *ssid) {
+  std::strcpy(persistent_.wifiSsid, ssid);
+}
+void Configuration::updateWifiPassword(const char *password) {
+  std::strcpy(persistent_.wifiPassword, password);
+}
+
+void Configuration::updateServerAddr(const char *serverAddr) {
+  std::strcpy(persistent_.serverAddr, serverAddr);
+}
+void Configuration::updateGearTypeId(const int id) {
+  persistent_.gearTypeId = id;
+}
+void Configuration::commitUpdate() { writeToEEPROM(); }
 
 } // namespace cooboc

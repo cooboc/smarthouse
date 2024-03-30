@@ -16,7 +16,7 @@ public:
     CONNECTED,
     WRONG_AP,
   };
-  WifiHandler(const Configuration &configuration_);
+  WifiHandler(Configuration &configuration_);
   void startWebPortal();
   void startConnectAp(const char *ssid, const char *password) const;
   WifiHandler::WifiStatus getWifiStatus() const;

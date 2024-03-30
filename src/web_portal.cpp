@@ -6,7 +6,7 @@
 
 namespace cooboc {
 
-WebPortal::WebPortal(const Configuration &configuration)
+WebPortal::WebPortal(Configuration &configuration)
     : configuration_{configuration}, webServer_{80} {}
 
 void WebPortal::begin() {
@@ -79,38 +79,41 @@ void WebPortal::handleWebSetting(void) {
   webServer_.sendContent(updStr);
   webServer_.client().stop();
 
-  char buf[256];
+  char buf[64];
 
   // Parse ssid
-  webServer_.arg("s").toCharArray(buf, 256);
-  buf[255] = '\0';
-  char ssid[256];
-  std::strcpy(ssid, buf);
+  webServer_.arg("s").toCharArray(buf, 64);
+  buf[63] = '\0';
+  configuration_.updateWifiSsid(buf);
 
   // Parse wifi password
-  webServer_.arg("w").toCharArray(buf, 256);
-  buf[255] = '\0';
-  char password[256];
-  std::strcpy(password, buf);
+  webServer_.arg("w").toCharArray(buf, 64);
+  buf[63] = '\0';
+  configuration_.updateWifiPassword(buf);
 
-  // Parse host
-  webServer_.arg("h").toCharArray(buf, 256);
-  buf[255] = '\0';
-  char host[256];
-  std::strcpy(host, buf);
+  // Parse server address
+  webServer_.arg("h").toCharArray(buf, 64);
+  buf[63] = '\0';
+  configuration_.updateServerAddr(buf);
 
   // Parse type
   int type = webServer_.arg("t").toInt();
+  configuration_.updateGearTypeId(type);
 
   Serial.println("get config from web portal:");
   Serial.print("ssid: ");
-  Serial.println(ssid);
+  Serial.println(configuration_.getWifiSsid());
   Serial.print("password: ");
-  Serial.println(password);
-  Serial.print("Host: ");
-  Serial.println(host);
+  Serial.println(configuration_.getWifiPassword());
+  Serial.print("Server: ");
+  Serial.println(configuration_.getServerAddr());
   Serial.print("type: ");
   Serial.println(type);
+
+  configuration_.commitUpdate();
+
+  // TODO: optional, should notify state machine to restart the system.
+  ESP.restart();
 }
 
 } // namespace cooboc

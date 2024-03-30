@@ -12,20 +12,28 @@ public:
   Configuration();
   void begin();
 
-  inline const bool isWifiCredentialExists(void) const {
-    return this->persistent_.isWifiCredentialExists;
-    // return std::strlen(this->persistent_.wifiSsid) > 0;
-  }
   inline const char *getHostname(void) const { return hostname_; }
   inline const char *getSelfAPName(void) const { return selfApName_; }
   inline const char *getPrintableId(void) const { return idStr_; }
   void getGearNameListString(char *buf) const;
 
-  // TODO
+  void updateConfiguration(const char *ssid, const char *password,
+                           const char *serverAddr, const int id);
+  void updateWifiSsid(const char *ssid);
+  void updateWifiPassword(const char *password);
+  void updateServerAddr(const char *serverAddr);
+  void updateGearTypeId(const int id);
+  void commitUpdate();
+  bool isWifiCredentialExists() const {
+    return (std::strlen(persistent_.wifiSsid) > 0);
+  }
+
   inline const char *getWifiSsid(void) const { return persistent_.wifiSsid; }
-  // TODO
   inline const char *getWifiPassword(void) const {
     return persistent_.wifiPassword;
+  }
+  inline const char *getServerAddr(void) const {
+    return persistent_.serverAddr;
   }
 
 private:

@@ -9,12 +9,12 @@ namespace cooboc {
 class WebPortal {
 
 public:
-  WebPortal(const Configuration &configuration);
+  WebPortal(Configuration &configuration);
   void begin();
   void tick();
 
 private:
-  const Configuration &configuration_;
+  Configuration &configuration_;
   DNSServer dnsServer_;
   ESP8266WebServer webServer_;
 

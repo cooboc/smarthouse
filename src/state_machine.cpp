@@ -21,6 +21,7 @@ void StateMachine::begin() {
   if (configuration_.isWifiCredentialExists()) {
     transitTo(State::CONNECTING);
   } else {
+    Serial.println("No wifi credential exists, go to web portal.");
     transitTo(State::CONFIG_PORTAL);
   }
 }
@@ -86,7 +87,8 @@ void StateMachine::transitTo(State newState) {
   case (State::CONNECTING): {
     wifi_.startConnectAp(configuration_.getWifiSsid(),
                          configuration_.getWifiPassword());
-    Serial.print("Connecting");
+    Serial.print("Connecting: ");
+    Serial.println(configuration_.getWifiSsid());
     break;
   }
   case (State::WORKING_WITH_WIFI): {

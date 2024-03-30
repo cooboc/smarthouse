@@ -5,14 +5,17 @@ namespace cooboc {
 
 namespace {} // namespace
 
-WifiHandler::WifiHandler(const Configuration &configuration)
+WifiHandler::WifiHandler(Configuration &configuration)
     : configuration_(configuration), webPortal_{configuration},
       isWebPortalStarted_{false} {}
 
 void WifiHandler::startConnectAp(const char *ssid, const char *password) const {
   // TODO need to check current status, stop current status
 
-  Serial.println("begin to connect wifi");
+  Serial.print("begin to connect wifi : ");
+  Serial.print(ssid);
+  Serial.print(" / ");
+  Serial.println(password);
   // Wifi.begin
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
