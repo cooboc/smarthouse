@@ -92,6 +92,7 @@ void StateMachine::transitTo(State newState) {
     break;
   }
   case (State::WORKING_WITH_WIFI): {
+
     Serial.println("TODO switch to WORKING_STANDALONE, connect server");
     break;
   }
