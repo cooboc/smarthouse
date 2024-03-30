@@ -63,6 +63,54 @@ void WebPortal::handleWebRoot(void) {
   webServer_.sendContent(FPSTR(htmlSetupBody3));
   webServer_.client().stop();
 }
-void WebPortal::handleWebSetting(void) {}
+void WebPortal::handleWebSetting(void) {
+  static const char updStr[] = "updating...</body></html>";
+  constexpr size_t totalLenght = sizeof(htmlHeader1) - 1 + sizeof(htmlHeader2) -
+                                 1 + sizeof(htmlHeader3) - 1 + sizeof(updStr) -
+                                 1;
+  webServer_.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  webServer_.sendHeader("Pragma", "no-cache");
+  webServer_.sendHeader("Expires", "-1");
+  webServer_.setContentLength(totalLenght);
+  webServer_.send(200, "text/html", "");
+  webServer_.sendContent(FPSTR(htmlHeader1));
+  webServer_.sendContent(FPSTR(htmlHeader2));
+  webServer_.sendContent(FPSTR(htmlHeader3));
+  webServer_.sendContent(updStr);
+  webServer_.client().stop();
+
+  char buf[256];
+
+  // Parse ssid
+  webServer_.arg("s").toCharArray(buf, 256);
+  buf[255] = '\0';
+  char ssid[256];
+  std::strcpy(ssid, buf);
+
+  // Parse wifi password
+  webServer_.arg("w").toCharArray(buf, 256);
+  buf[255] = '\0';
+  char password[256];
+  std::strcpy(password, buf);
+
+  // Parse host
+  webServer_.arg("h").toCharArray(buf, 256);
+  buf[255] = '\0';
+  char host[256];
+  std::strcpy(host, buf);
+
+  // Parse type
+  int type = webServer_.arg("t").toInt();
+
+  Serial.println("get config from web portal:");
+  Serial.print("ssid: ");
+  Serial.println(ssid);
+  Serial.print("password: ");
+  Serial.println(password);
+  Serial.print("Host: ");
+  Serial.println(host);
+  Serial.print("type: ");
+  Serial.println(type);
+}
 
 } // namespace cooboc
