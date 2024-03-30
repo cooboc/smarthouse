@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "romp_client.h"
 #include "state_machine.h"
 #include "wifi_handler.h"
 
@@ -6,7 +7,8 @@
 
 cooboc::Configuration configuration{};
 cooboc::WifiHandler wifiHandler{configuration};
-cooboc::StateMachine sm{configuration, wifiHandler};
+cooboc::RompClient romp{configuration};
+cooboc::StateMachine sm{configuration, wifiHandler, romp};
 
 void setup() {
   Serial.begin(115200);

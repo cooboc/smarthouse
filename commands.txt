@@ -8,8 +8,12 @@ arduino-cli upload -p COM3 --input-dir .cache --fqbn esp8266:esp8266:generic poc
 monitor:
 arduino-cli monitor --port COM3 --config baudrate=115200
 
-
+install libarary:
+first, change library.enable_unsafe_install to true in /mnt/c/Users/heqichen/AppData/Local/Arduino15/arduino-cli.yaml, or you won't be able to install any library from git or zip
+arduino-cli lib install --zip-path lib\ESPAsyncTCP-master.zip
 
 arduino-cli compile --verbose --build-cache-path .cache --build-path .cache --fqbn esp8266:esp8266:generic src
 arduino-cli upload -p COM3 --input-dir .cache --fqbn esp8266:esp8266:generic src
 arduino-cli monitor -p COM3 --config baudrate=115200
+
+

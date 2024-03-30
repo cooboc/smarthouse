@@ -50,6 +50,11 @@ void Configuration::begin() {
   if (!isPersistentHealthy) {
     Serial.println("first start, reset persistent.");
     persistent_.reset();
+
+    // TODO: CHANGEME: for debug only
+    std::strcpy(persistent_.wifiSsid, "astrolek");
+    std::strcpy(persistent_.wifiPassword, "rootroot");
+    std::strcpy(persistent_.serverAddr, "10.1.99.60");
     writeToEEPROM();
   } else {
     Serial.println("EEPROM good!");
@@ -80,7 +85,7 @@ bool Configuration::readFromEEPROM() {
   Serial.print(readoutCrc);
   Serial.print(" ,expect CRC: ");
   Serial.println(expectCrc);
-  return expectCrc == readoutCrc;
+  return (expectCrc == readoutCrc) && (persistent_.dirty == CLEAN_FLASH_VALUE);
 }
 
 void Configuration::writeToEEPROM() {

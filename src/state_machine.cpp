@@ -12,8 +12,8 @@ namespace cooboc {
 // It may cause undefined behaviour. To avoid this situation, I have to make
 // this compromise. Move all initialization code to begin() function.
 StateMachine::StateMachine(const Configuration &configuration,
-                           WifiHandler &wifi)
-    : configuration_(configuration), wifi_(wifi) {}
+                           WifiHandler &wifi, RompClient &rompClient)
+    : configuration_(configuration), wifi_(wifi), rompClient_{rompClient} {}
 
 void StateMachine::begin() {
   Serial.println("begin state machine");
@@ -70,7 +70,17 @@ void StateMachine::tick() {
   }
 }
 
-void StateMachine::transitOut() {}
+void StateMachine::transitOut() {
+  switch (state_) {
+  case (State::WORKING_WITH_WIFI): {
+    rompClient_.end();
+    break;
+  }
+  default: {
+    break;
+  }
+  }
+}
 void StateMachine::transitTo(State newState) {
   state_ = newState;
   switch (state_) {
@@ -92,8 +102,7 @@ void StateMachine::transitTo(State newState) {
     break;
   }
   case (State::WORKING_WITH_WIFI): {
-
-    Serial.println("TODO switch to WORKING_STANDALONE, connect server");
+    rompClient_.begin();
     break;
   }
   default: {
