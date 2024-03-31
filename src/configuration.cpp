@@ -35,10 +35,10 @@ constexpr std::size_t PERSISTENT_LENGTH = sizeof(Persistent);
 Configuration::Configuration() : gearList_{new TestGear()} {}
 void Configuration::begin() {
   debugPrintGears();
-  const std::uint32_t chipId = ESP.getChipId();
+  deviceId_ = ESP.getChipId();
   constexpr char NAMEPREFIX[] = "csg-";
   constexpr std::size_t NAMEPREFIX_LENGTH = sizeof(NAMEPREFIX) - 1U;
-  makePrintableId(chipId, idStr_);
+  makePrintableId(deviceId_, idStr_);
 
   std::strcpy(hostname_, NAMEPREFIX);
   std::strcpy(selfApName_, NAMEPREFIX);
@@ -80,7 +80,7 @@ bool Configuration::readFromEEPROM() {
   EEPROM.end();
   std::uint16_t readoutCrc = persistent_.crc;
   persistent_.crc = 0;
-  std::uint16_t expectCrc = calculateCrc(targetAddr, PERSISTENT_LENGTH);
+  std::uint16_t expectCrc = utils::calculateCrc(targetAddr, PERSISTENT_LENGTH);
   Serial.print("Readout crc: ");
   Serial.print(readoutCrc);
   Serial.print(" ,expect CRC: ");
@@ -91,7 +91,7 @@ bool Configuration::readFromEEPROM() {
 void Configuration::writeToEEPROM() {
   std::uint8_t *targetAddr = (std::uint8_t *)(&persistent_);
   persistent_.crc = 0U;
-  std::uint16_t crc = calculateCrc(targetAddr, PERSISTENT_LENGTH);
+  std::uint16_t crc = utils::calculateCrc(targetAddr, PERSISTENT_LENGTH);
   persistent_.crc = crc;
   EEPROM.begin(PERSISTENT_LENGTH);
   for (std::size_t i{0U}; i < PERSISTENT_LENGTH; ++i) {
@@ -134,7 +134,8 @@ void Configuration::getGearNameListString(char *buf) const {
 }
 
 void Configuration::updateConfiguration(const char *ssid, const char *password,
-                                        const char *serverAddr, const int id) {
+                                        const char *serverAddr,
+                                        const std::uint8_t id) {
   std::strcpy(persistent_.wifiSsid, ssid);
   std::strcpy(persistent_.wifiPassword, password);
   std::strcpy(persistent_.serverAddr, serverAddr);
@@ -152,7 +153,7 @@ void Configuration::updateWifiPassword(const char *password) {
 void Configuration::updateServerAddr(const char *serverAddr) {
   std::strcpy(persistent_.serverAddr, serverAddr);
 }
-void Configuration::updateGearTypeId(const int id) {
+void Configuration::updateGearTypeId(const std::uint8_t id) {
   persistent_.gearTypeId = id;
 }
 void Configuration::commitUpdate() { writeToEEPROM(); }

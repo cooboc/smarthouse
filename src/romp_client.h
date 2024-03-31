@@ -6,6 +6,11 @@
 #include <cstdint>
 
 namespace cooboc {
+
+namespace detail {
+constexpr std::size_t PACKET_HEAD_LENGTH{10U};
+}
+
 /**
  * @brief ROMP is a protocol for communication between smart gear with the
  * server.
@@ -26,13 +31,25 @@ private:
     BAD,
   };
 
+  enum class PakcetType : std::uint8_t {
+    HEARTBEAT = 1U,
+  };
+
   const Configuration &configuration_;
   AsyncClient *socketClient_{nullptr};
   Status status_{Status::IDLE};
   std::uint32_t lastHeartbeatTime_{0UL};
 
+  // Packet related data
+  // HEAD: 'A5', PROTOCOL_VERSION, ID,type,seq
+  // BODY: heartbeat,ext
+  std::uint8_t packetBuffer_[detail::PACKET_HEAD_LENGTH]{0U};
+  std::uint8_t packetSeq_{0U};
+
   void onSocketConnected();
+  void sendHeartbeat();
 };
+
 } // namespace cooboc
 
 #endif

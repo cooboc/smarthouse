@@ -1,11 +1,20 @@
 #include "romp_client.h"
+#include "utils.h"
 #include <Arduino.h>
 
 namespace cooboc {
 
 RompClient::RompClient(const Configuration &configuration)
     : configuration_{configuration}, socketClient_{nullptr},
-      status_{Status::IDLE}, lastHeartbeatTime_{0UL} {}
+      status_{Status::IDLE}, lastHeartbeatTime_{0UL}, packetSeq_{0U} {
+  packetBuffer_[0] = 'A';
+  packetBuffer_[1] = '5';
+  packetBuffer_[2] = 1; // current version
+  const uint32_t deviceId = configuration.getDeviceId();
+  utils::writeUint32(deviceId, packetBuffer_ + 3);
+  const uint8_t typeId = configuration.getGearTypeId();
+  utils::writeUint8(typeId, packetBuffer_ + 7);
+}
 
 void RompClient::begin() {
   socketClient_ = new AsyncClient();
@@ -31,11 +40,20 @@ void RompClient::begin() {
 
 void RompClient::tick() {
   if (status_ == Status::CONNECTED) {
-    if (millis() - lastHeartbeatTime_ > 1000UL) {
+    if (millis() - lastHeartbeatTime_ > 2000UL) {
       lastHeartbeatTime_ = millis();
-      socketClient_->write("Hello world!", std::strlen("Hello world!"));
+      sendHeartbeat();
     }
   }
+}
+
+void RompClient::sendHeartbeat() {
+  packetBuffer_[8] =
+      static_cast<std::underlying_type_t<PakcetType>>(PakcetType::HEARTBEAT);
+  packetBuffer_[9] = 0U;
+  socketClient_->write((const char *)packetBuffer_, detail::PACKET_HEAD_LENGTH);
+
+  // socketClient_->write("Hello world!", std::strlen("Hello world!"));
 }
 
 void RompClient::end() {}

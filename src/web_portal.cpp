@@ -98,7 +98,7 @@ void WebPortal::handleWebSetting(void) {
 
   // Parse type
   int type = webServer_.arg("t").toInt();
-  configuration_.updateGearTypeId(type);
+  configuration_.updateGearTypeId(static_cast<std::uint8_t>(type));
 
   Serial.println("get config from web portal:");
   Serial.print("ssid: ");

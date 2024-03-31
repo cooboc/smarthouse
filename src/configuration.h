@@ -15,14 +15,16 @@ public:
   inline const char *getHostname(void) const { return hostname_; }
   inline const char *getSelfAPName(void) const { return selfApName_; }
   inline const char *getPrintableId(void) const { return idStr_; }
+  inline uint32_t getDeviceId(void) const { return deviceId_; }
+  inline uint8_t getGearTypeId(void) const { return persistent_.gearTypeId; }
   void getGearNameListString(char *buf) const;
 
   void updateConfiguration(const char *ssid, const char *password,
-                           const char *serverAddr, const int id);
+                           const char *serverAddr, std::uint8_t id);
   void updateWifiSsid(const char *ssid);
   void updateWifiPassword(const char *password);
   void updateServerAddr(const char *serverAddr);
-  void updateGearTypeId(const int id);
+  void updateGearTypeId(std::uint8_t id);
   void commitUpdate();
   bool isWifiCredentialExists() const {
     return (std::strlen(persistent_.wifiSsid) > 0);
@@ -37,6 +39,7 @@ public:
   }
 
 private:
+  uint32_t deviceId_{0U};
   char idStr_[7];       // 123456
   char hostname_[12];   //"csg-[6]";
   char selfApName_[12]; //"csg-[6]", csg-123456;
