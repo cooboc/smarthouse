@@ -13,7 +13,7 @@ first, change library.enable_unsafe_install to true in /mnt/c/Users/heqichen/App
 arduino-cli lib install --zip-path lib\ESPAsyncTCP-master.zip
 
 arduino-cli compile --verbose --build-cache-path .cache --build-path .cache --fqbn esp8266:esp8266:generic src
-arduino-cli upload -p COM3 --input-dir .cache --fqbn esp8266:esp8266:generic src
-arduino-cli monitor -p COM3 --config baudrate=115200
+arduino-cli upload -p COM13 --input-dir .cache --fqbn esp8266:esp8266:generic src
+arduino-cli monitor -p COM13 --config baudrate=115200
 
 

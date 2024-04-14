@@ -7,11 +7,13 @@ namespace cooboc {
 
 class TestGear : public IGear {
 public:
-  TestGear();
+  TestGear(){};
   virtual ~TestGear() {}
   virtual const char *getName() const;
+  virtual const PinList &getInputPins() const { return emptyPinList_; };
 
 private:
+  const PinList emptyPinList_{};
 };
 } // namespace cooboc
 #endif

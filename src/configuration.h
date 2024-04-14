@@ -18,6 +18,7 @@ public:
   inline uint32_t getDeviceId(void) const { return deviceId_; }
   inline uint8_t getGearTypeId(void) const { return persistent_.gearTypeId; }
   void getGearNameListString(char *buf) const;
+  const IGear *getGear() const;
 
   void updateConfiguration(const char *ssid, const char *password,
                            const char *serverAddr, std::uint8_t id);
@@ -26,6 +27,7 @@ public:
   void updateServerAddr(const char *serverAddr);
   void updateGearTypeId(std::uint8_t id);
   void commitUpdate();
+
   bool isWifiCredentialExists() const {
     return (std::strlen(persistent_.wifiSsid) > 0);
   }
@@ -45,7 +47,7 @@ private:
   char selfApName_[12]; //"csg-[6]", csg-123456;
 
   Persistent persistent_;
-  std::array<const IGear *, 1U> gearList_;
+  std::array<const IGear *, 2U> gearList_;
   bool readFromEEPROM();
   void writeToEEPROM();
 

@@ -2,9 +2,7 @@
 
 namespace cooboc {
 
-constexpr char GEAR_NAME[]{"TEST"};
-
-TestGear::TestGear() {}
+static constexpr char GEAR_NAME[]{"TEST"};
 
 const char *TestGear::getName() const { return GEAR_NAME; }
 

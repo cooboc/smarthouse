@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "button3_gear.h"
 #include "data_def.h"
 #include "test_gear.h"
 #include "utils.h"
@@ -32,7 +33,7 @@ constexpr std::size_t PERSISTENT_LENGTH = sizeof(Persistent);
 
 } // namespace
 
-Configuration::Configuration() : gearList_{new TestGear()} {}
+Configuration::Configuration() : gearList_{new TestGear(), new Button3Gear()} {}
 void Configuration::begin() {
   debugPrintGears();
   deviceId_ = ESP.getChipId();
@@ -55,6 +56,7 @@ void Configuration::begin() {
     std::strcpy(persistent_.wifiSsid, "astrolek");
     std::strcpy(persistent_.wifiPassword, "rootroot");
     std::strcpy(persistent_.serverAddr, "10.1.99.60");
+    persistent_.gearTypeId = 1U;
     writeToEEPROM();
   } else {
     Serial.println("EEPROM good!");
@@ -111,6 +113,14 @@ void Configuration::debugPrintGears() {
   }
   Serial.println("-------");
 }
+
+const IGear *Configuration::getGear() const {
+  const auto id = persistent_.gearTypeId;
+  if (id >= 0U && id < gearList_.size()) {
+    return gearList_.at(id);
+  }
+  return nullptr;
+};
 
 void Configuration::getGearNameListString(char *buf) const {
   buf[0] = '\0';
