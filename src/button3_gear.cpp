@@ -5,7 +5,8 @@
 namespace cooboc {
 
 static constexpr char GEAR_NAME[]{"3-Button"};
-static const PinList PIN_LIST{12U, 14U, 5U};
+// static const PinList PIN_LIST{12U, 14U, 5U};
+static const PinList PIN_LIST{12U};
 
 const char *Button3Gear::getName() const { return GEAR_NAME; }
 

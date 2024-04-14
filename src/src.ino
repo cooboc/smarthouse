@@ -19,4 +19,7 @@ void setup() {
   sm.begin();
 }
 
-void loop() { sm.tick(); }
+void loop() {
+  hal.tick();
+  sm.tick();
+}
