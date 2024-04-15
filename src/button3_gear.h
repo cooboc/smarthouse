@@ -4,6 +4,7 @@
 #include "button.h"
 #include "i_gear.h"
 #include <array>
+#include <functional>
 
 namespace cooboc {
 class Button3Gear : public IGear {
@@ -24,6 +25,7 @@ private:
 
   private:
     std::array<Button, 3U> buttons_;
+    std::uint8_t userActionPayload_[2];
 
     static Button3GearInstance *instance_;
     Button3GearInstance();

@@ -28,8 +28,15 @@ Button3Gear::Button3GearInstance::getInstance(void) {
 }
 
 void Button3Gear::Button3GearInstance::setup() {
-  for (Button &b : buttons_) {
-    b.setup();
+  for (std::size_t i{0U}; i < buttons_.size(); ++i) {
+    buttons_[i].setup();
+    buttons_[i].onPushDown([this, i]() {
+      Serial.print(i);
+      Serial.println(" button pushed down");
+      userActionPayload_[0] = 0;
+      userActionPayload_[1] = i;
+      userActionCallback_(userActionPayload_);
+    });
   }
 }
 

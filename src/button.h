@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <cstdio>
+#include <functional>
 
 namespace cooboc {
 class Button {
@@ -16,6 +17,9 @@ public:
   void setup();
   void tick();
   bool isPushed() const;
+  void onPushDown(std::function<void(void)> callback) {
+    pushDownCallback_ = callback;
+  }
 
 private:
   std::uint8_t pin_;
@@ -25,6 +29,8 @@ private:
   unsigned long debouncingTime_;
 
   unsigned long clickStartTime_;
+
+  std::function<void(void)> pushDownCallback_ = []() {};
 
   void behaviourDetector(int currentValue);
 };

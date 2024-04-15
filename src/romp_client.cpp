@@ -36,6 +36,17 @@ void RompClient::begin() {
   Serial.print("ready to connect server: ");
   Serial.print(configuration_.getServerAddr());
   Serial.println(":8113");
+
+  auto gearPtr = configuration_.getGearInstance();
+  if (gearPtr != nullptr) {
+    gearPtr->onUserAction([this](void *payload) {
+      std::memcpy(packetBuffer_ + detail::PACKET_HEAD_LENGTH, payload, 2U);
+
+      socketClient_->write((const char *)packetBuffer_,
+                           detail::PACKET_HEAD_LENGTH +
+                               detail::PACKET_BODY_LENGTH);
+    });
+  }
 }
 
 void RompClient::tick() {
@@ -55,7 +66,7 @@ void RompClient::sendHeartbeat() {
     packetBuffer_[detail::PACKET_HEAD_LENGTH + 1U] = 0U;
   } else {
     gearPtr->fillStatus(packetBuffer_ + detail::PACKET_HEAD_LENGTH + 1U);
-    }
+  }
 
   socketClient_->write((const char *)packetBuffer_,
                        detail::PACKET_HEAD_LENGTH + detail::PACKET_BODY_LENGTH);
