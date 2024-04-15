@@ -8,8 +8,10 @@
 namespace cooboc {
 
 namespace detail {
-constexpr std::size_t PACKET_HEAD_LENGTH{10U};
-}
+constexpr std::size_t PACKET_HEAD_LENGTH{8U};
+constexpr std::size_t PACKET_BODY_LENGTH{3U};
+
+} // namespace detail
 
 /**
  * @brief ROMP is a protocol for communication between smart gear with the
@@ -41,9 +43,10 @@ private:
   std::uint32_t lastHeartbeatTime_{0UL};
 
   // Packet related data
-  // HEAD: 'A5', PROTOCOL_VERSION, ID,type,seq
+  // HEAD: 'A5', PROTOCOL_VERSION, ESP_ID,type
   // BODY: heartbeat,ext
-  std::uint8_t packetBuffer_[detail::PACKET_HEAD_LENGTH]{0U};
+  std::uint8_t packetBuffer_[detail::PACKET_HEAD_LENGTH +
+                             detail::PACKET_BODY_LENGTH]{0U};
   std::uint8_t packetSeq_{0U};
 
   void onSocketConnected();

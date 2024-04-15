@@ -2,9 +2,18 @@
 #include <Arduino.h>
 
 namespace cooboc {
+
+constexpr unsigned long CLICK_TIME_THRESHOLD{400U};
+
 Button::Button(std::uint8_t pin)
     : pin_{pin}, initValue_{1}, lastValue_{1}, debouncingValue_{1},
-      debouncingTime_{0U} {}
+      debouncingTime_{0U}, clickStartTime_{0U} {}
+
+Button::Button(const Button &&b)
+    : pin_{b.pin_}, initValue_{b.initValue_}, lastValue_{b.lastValue_},
+      debouncingTime_{b.debouncingTime_}, debouncingValue_{b.debouncingValue_},
+      clickStartTime_{0U} {}
+
 void Button::setup() {
   pinMode(pin_, INPUT_PULLUP);
   Serial.print("setup pin #");
@@ -26,15 +35,33 @@ void Button::tick() {
       // keep push, check the time
       const unsigned long currentTime = millis();
       if ((currentTime - debouncingTime_) > 20U) {
-        Serial.println("button fliped");
         lastValue_ = debouncingValue_;
         debouncingTime_ = 0U;
+        behaviourDetector(currentValue);
       }
     } else {
       // User relase the button, reset the value
       debouncingValue_ = lastValue_;
       debouncingTime_ = 0;
     }
+  }
+}
+
+bool Button::isPushed() const { return lastValue_ != initValue_; }
+
+void Button::behaviourDetector(int currentValue) {
+  if (currentValue == initValue_) {
+    Serial.println("realsed");
+    // relased
+    if ((millis() - clickStartTime_) < CLICK_TIME_THRESHOLD) {
+      Serial.println("clicked");
+    } else {
+      Serial.println("long push");
+    }
+  } else {
+    // pushed
+    Serial.println("push down");
+    clickStartTime_ = millis();
   }
 }
 

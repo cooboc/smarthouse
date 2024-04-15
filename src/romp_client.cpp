@@ -9,7 +9,7 @@ RompClient::RompClient(const Configuration &configuration)
       status_{Status::IDLE}, lastHeartbeatTime_{0UL}, packetSeq_{0U} {
   packetBuffer_[0] = 'A';
   packetBuffer_[1] = '5';
-  packetBuffer_[2] = 1; // current version
+  packetBuffer_[2] = 1; // current protocol version
   const uint32_t deviceId = configuration.getDeviceId();
   utils::writeUint32(deviceId, packetBuffer_ + 3);
   const uint8_t typeId = configuration.getGearTypeId();
@@ -48,10 +48,17 @@ void RompClient::tick() {
 }
 
 void RompClient::sendHeartbeat() {
-  packetBuffer_[8] =
+  packetBuffer_[detail::PACKET_HEAD_LENGTH] =
       static_cast<std::underlying_type_t<PakcetType>>(PakcetType::HEARTBEAT);
-  packetBuffer_[9] = 0U;
-  socketClient_->write((const char *)packetBuffer_, detail::PACKET_HEAD_LENGTH);
+  auto gearPtr = configuration_.getGearInstance();
+  if (gearPtr == nullptr) {
+    packetBuffer_[detail::PACKET_HEAD_LENGTH + 1U] = 0U;
+  } else {
+    gearPtr->fillStatus(packetBuffer_ + detail::PACKET_HEAD_LENGTH + 1U);
+    }
+
+  socketClient_->write((const char *)packetBuffer_,
+                       detail::PACKET_HEAD_LENGTH + detail::PACKET_BODY_LENGTH);
 
   // socketClient_->write("Hello world!", std::strlen("Hello world!"));
 }

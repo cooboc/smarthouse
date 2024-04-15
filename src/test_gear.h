@@ -10,7 +10,7 @@ public:
   TestGear(){};
   virtual ~TestGear() {}
   virtual const char *getName() const;
-  virtual IGearInstance *buildInstance() const { return nullptr; };
+  // virtual IGearInstance *getInstance() const { return nullptr; };
 
 private:
 };

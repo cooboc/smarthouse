@@ -8,16 +8,14 @@ namespace cooboc {
 class Button {
 public:
   Button(std::uint8_t pin);
+  Button(const Button &&b);
   Button(const Button &) = delete;
-  Button(const Button &&b)
-      : pin_{b.pin_}, initValue_{b.initValue_}, lastValue_{b.lastValue_},
-        debouncingTime_{b.debouncingTime_},
-        debouncingValue_{b.debouncingValue_} {}
   Button &operator=(const Button &) = delete;
   ~Button() {}
 
   void setup();
   void tick();
+  bool isPushed() const;
 
 private:
   std::uint8_t pin_;
@@ -25,6 +23,10 @@ private:
   int lastValue_;
   int debouncingValue_;
   unsigned long debouncingTime_;
+
+  unsigned long clickStartTime_;
+
+  void behaviourDetector(int currentValue);
 };
 } // namespace cooboc
 

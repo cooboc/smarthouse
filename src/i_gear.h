@@ -10,6 +10,7 @@ class IGearInstance {
 public:
   virtual void setup() = 0;
   virtual void tick() = 0;
+  virtual void fillStatus(std::uint8_t *buffer) const = 0;
 };
 
 class IGear {
@@ -17,7 +18,7 @@ public:
   virtual ~IGear() {}
   virtual const char *getName() const = 0;
 
-  virtual IGearInstance *buildInstance() const = 0;
+  virtual IGearInstance *getInstance() const { return nullptr; };
 };
 } // namespace cooboc
 

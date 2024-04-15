@@ -79,7 +79,7 @@ void Configuration::begin() {
   if ((id >= 0U) && (id < gearList_.size())) {
     const IGear *gear = gearList_.at(id);
     if (gear != nullptr) {
-      gearInstance_ = gear->buildInstance();
+      gearInstance_ = gear->getInstance();
     }
   }
 }
