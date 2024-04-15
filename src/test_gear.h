@@ -10,10 +10,9 @@ public:
   TestGear(){};
   virtual ~TestGear() {}
   virtual const char *getName() const;
-  virtual const PinList &getInputPins() const { return emptyPinList_; };
+  virtual IGearInstance *buildInstance() const { return nullptr; };
 
 private:
-  const PinList emptyPinList_{};
 };
 } // namespace cooboc
 #endif

@@ -6,9 +6,28 @@ namespace cooboc {
 
 static constexpr char GEAR_NAME[]{"3-Button"};
 // static const PinList PIN_LIST{12U, 14U, 5U};
-static const PinList PIN_LIST{12U};
+
+Button3Gear::Button3Gear() {}
 
 const char *Button3Gear::getName() const { return GEAR_NAME; }
 
-const PinList &Button3Gear::getInputPins() const { return PIN_LIST; }
+Button3Gear::Button3GearInstance::Button3GearInstance()
+    : buttons_{Button{12U}, Button{14U}, Button{5U}} {}
+
+void Button3Gear::Button3GearInstance::setup() {
+  for (Button &b : buttons_) {
+    b.setup();
+  }
+}
+
+void Button3Gear::Button3GearInstance::tick() {
+  for (Button &b : buttons_) {
+    b.tick();
+  }
+}
+
+IGearInstance *Button3Gear::buildInstance() const {
+  return new Button3GearInstance();
+}
+
 } // namespace cooboc

@@ -5,7 +5,11 @@ namespace cooboc {
 Button::Button(std::uint8_t pin)
     : pin_{pin}, initValue_{1}, lastValue_{1}, debouncingValue_{1},
       debouncingTime_{0U} {}
-void Button::setup() { pinMode(pin_, INPUT_PULLUP); }
+void Button::setup() {
+  pinMode(pin_, INPUT_PULLUP);
+  Serial.print("setup pin #");
+  Serial.println(pin_);
+}
 void Button::tick() {
   const int currentValue = digitalRead(pin_);
   if (lastValue_ == debouncingValue_) {

@@ -18,7 +18,7 @@ public:
   inline uint32_t getDeviceId(void) const { return deviceId_; }
   inline uint8_t getGearTypeId(void) const { return persistent_.gearTypeId; }
   void getGearNameListString(char *buf) const;
-  const IGear *getGear() const;
+  IGearInstance *getGearInstance(void) const { return gearInstance_; }
 
   void updateConfiguration(const char *ssid, const char *password,
                            const char *serverAddr, std::uint8_t id);
@@ -48,6 +48,7 @@ private:
 
   Persistent persistent_;
   std::array<const IGear *, 2U> gearList_;
+  IGearInstance *gearInstance_;
   bool readFromEEPROM();
   void writeToEEPROM();
 

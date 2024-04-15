@@ -6,13 +6,18 @@
 
 namespace cooboc {
 
-using PinList = std::vector<std::uint8_t>;
+class IGearInstance {
+public:
+  virtual void setup() = 0;
+  virtual void tick() = 0;
+};
 
 class IGear {
 public:
   virtual ~IGear() {}
   virtual const char *getName() const = 0;
-  virtual const PinList &getInputPins() const = 0;
+
+  virtual IGearInstance *buildInstance() const = 0;
 };
 } // namespace cooboc
 

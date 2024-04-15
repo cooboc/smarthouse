@@ -33,7 +33,8 @@ constexpr std::size_t PERSISTENT_LENGTH = sizeof(Persistent);
 
 } // namespace
 
-Configuration::Configuration() : gearList_{new TestGear(), new Button3Gear()} {}
+Configuration::Configuration()
+    : gearList_{new TestGear(), new Button3Gear()}, gearInstance_{nullptr} {}
 void Configuration::begin() {
   debugPrintGears();
   deviceId_ = ESP.getChipId();
@@ -56,7 +57,7 @@ void Configuration::begin() {
     std::strcpy(persistent_.wifiSsid, "astrolek");
     std::strcpy(persistent_.wifiPassword, "rootroot");
     std::strcpy(persistent_.serverAddr, "10.1.99.60");
-    persistent_.gearTypeId = 1U;
+    persistent_.gearTypeId = 1U; // set to 3 button
     writeToEEPROM();
   } else {
     Serial.println("EEPROM good!");
@@ -71,6 +72,16 @@ void Configuration::begin() {
   // strcpy(wifiPassword_, "rootroot");
   //   strcpy(wifiSsid_, "OnePlus 10 Pro 5G");
   //   strcpy(wifiPassword_, "rootroot");
+
+  const std::uint8_t &id = persistent_.gearTypeId;
+  Serial.print("gear id: ");
+  Serial.println(id);
+  if ((id >= 0U) && (id < gearList_.size())) {
+    const IGear *gear = gearList_.at(id);
+    if (gear != nullptr) {
+      gearInstance_ = gear->buildInstance();
+    }
+  }
 }
 
 bool Configuration::readFromEEPROM() {
@@ -113,14 +124,6 @@ void Configuration::debugPrintGears() {
   }
   Serial.println("-------");
 }
-
-const IGear *Configuration::getGear() const {
-  const auto id = persistent_.gearTypeId;
-  if (id >= 0U && id < gearList_.size()) {
-    return gearList_.at(id);
-  }
-  return nullptr;
-};
 
 void Configuration::getGearNameListString(char *buf) const {
   buf[0] = '\0';
