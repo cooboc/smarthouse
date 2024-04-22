@@ -3,6 +3,7 @@
 
 #include "button.h"
 #include "i_gear.h"
+#include "relay.h"
 #include <array>
 #include <functional>
 
@@ -19,12 +20,14 @@ private:
   public:
     static Button3GearInstance *getInstance(void);
 
-    virtual void setup();
-    virtual void tick();
-    virtual void fillStatus(std::uint8_t *buffer) const;
+    virtual void setup() override;
+    virtual void tick() override;
+    virtual void fillStatus(std::uint8_t *buffer) const override;
+    virtual void onServerRequest(ServerRequest req) override;
 
   private:
     std::array<Button, 3U> buttons_;
+    std::array<Relay, 3U> relays_;
     std::uint8_t userActionPayload_[2];
 
     static Button3GearInstance *instance_;

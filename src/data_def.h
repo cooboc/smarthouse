@@ -33,5 +33,24 @@ struct Persistent {
     crc = 134U; // just a random picked number, to invalidate the CRC.
   }
 };
+
+template <typename T> struct optional {
+  bool hasData = false;
+  T data;
+};
+
+struct ServerRequest {
+  enum class RequestType : std::uint8_t {
+    RELAY_ON,
+    RELAY_OFF,
+    RELAY_ON_LOCK,
+    RELAY_OFF_LOCK,
+    INVALID,
+  };
+
+  std::uint8_t portId{0U};
+  RequestType request{RequestType::INVALID};
+};
+
 } // namespace cooboc
 #endif

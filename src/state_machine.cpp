@@ -118,4 +118,5 @@ void StateMachine::handleConnectingTick(
   }
   }
 }
+
 } // namespace cooboc

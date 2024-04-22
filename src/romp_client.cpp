@@ -6,7 +6,8 @@ namespace cooboc {
 
 RompClient::RompClient(const Configuration &configuration)
     : configuration_{configuration}, socketClient_{nullptr},
-      status_{Status::IDLE}, lastHeartbeatTime_{0UL}, packetSeq_{0U} {
+      status_{Status::IDLE}, lastHeartbeatTime_{0UL}, packetSeq_{0U},
+      parser_{} {
   packetBuffer_[0] = 'A';
   packetBuffer_[1] = '5';
   packetBuffer_[2] = 1; // current protocol version
@@ -27,7 +28,9 @@ void RompClient::begin() {
       nullptr);
   //   socketClient_->onDisconnect(onDisconnectedCallback, this);
   //   socketClient_->onError(onErrorCallback, this);
-  //   socketClient_->onData(onDataCallback, this);
+  socketClient_->onData([this](void *, AsyncClient *, void *data,
+                               size_t len) { this->onSocketData(data, len); },
+                        nullptr);
   //   socketClient_->onTimeout(onTimeoutCallback, this);
   //   socketClient_->onPoll(onPollCallback, this);
   socketClient_->connect(configuration_.getServerAddr(), 8113);
@@ -79,6 +82,18 @@ void RompClient::end() {}
 void RompClient::onSocketConnected(void) {
   status_ = Status::CONNECTED;
   Serial.println("connected to server");
+}
+
+void RompClient::onSocketData(void *data, size_t len) {
+  Serial.print("got data length: ");
+  Serial.println(len);
+  ServerRequestOpt opt = parser_.prase(static_cast<std::uint8_t *>(data), len);
+  if (opt.hasData) {
+    auto gearPtr = configuration_.getGearInstance();
+    if (gearPtr != nullptr) {
+      gearPtr->onServerRequest(opt.data);
+    }
+  }
 }
 
 } // namespace cooboc

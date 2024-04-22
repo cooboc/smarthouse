@@ -1,6 +1,7 @@
 #ifndef __I_GEAR_H__
 #define __I_GEAR_H__
 
+#include "data_def.h"
 #include <cstdint>
 #include <functional>
 #include <vector>
@@ -16,7 +17,8 @@ public:
   virtual void fillStatus(std::uint8_t *buffer) const = 0;
   virtual void onUserAction(UserActionCallback callback) {
     userActionCallback_ = callback;
-  };
+  }
+  virtual void onServerRequest(ServerRequest req) {}
 
 protected:
   UserActionCallback userActionCallback_ = [](void *) {};

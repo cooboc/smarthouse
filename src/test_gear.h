@@ -9,7 +9,7 @@ class TestGear : public IGear {
 public:
   TestGear(){};
   virtual ~TestGear() {}
-  virtual const char *getName() const;
+  virtual const char *getName() const override;
   // virtual IGearInstance *getInstance() const { return nullptr; };
 
 private:

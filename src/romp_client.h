@@ -2,8 +2,10 @@
 #define __ROMP_CLIENT_H__
 
 #include "configuration.h"
+#include "romp_parser.h"
 #include <ESPAsyncTCP.h>
 #include <cstdint>
+#include <functional>
 
 namespace cooboc {
 
@@ -20,6 +22,8 @@ constexpr std::size_t PACKET_BODY_LENGTH{3U};
  */
 class RompClient {
 public:
+  using ServerRequestCallback = std::function<void(ServerRequest)>;
+
   RompClient(const Configuration &configuration);
   void begin();
   void tick();
@@ -42,6 +46,8 @@ private:
   Status status_{Status::IDLE};
   std::uint32_t lastHeartbeatTime_{0UL};
 
+  RompParser parser_;
+
   // Packet related data
   // HEAD: 'A5', PROTOCOL_VERSION, ESP_ID,type
   // BODY: heartbeat,ext
@@ -50,6 +56,7 @@ private:
   std::uint8_t packetSeq_{0U};
 
   void onSocketConnected();
+  void onSocketData(void *data, size_t len);
   void sendHeartbeat();
 };
 
