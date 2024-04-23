@@ -10,9 +10,11 @@ public:
   void setup();
 
   void set(bool status);
+  void toggle();
 
 private:
   std::uint8_t pin_;
+  bool status_;
 };
 } // namespace cooboc
 

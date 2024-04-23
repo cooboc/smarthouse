@@ -1,5 +1,5 @@
 #include "button3_gear.h"
-
+#include "data_def.h"
 #include <vector>
 
 namespace cooboc {
@@ -9,21 +9,28 @@ Button3Gear::Button3Gear() {}
 
 const char *Button3Gear::getName() const { return GEAR_NAME; }
 
-Button3Gear::Button3GearInstance::Button3GearInstance()
+Button3Gear::Button3GearInstance::Button3GearInstance(
+    const std::uint8_t *gearConfig)
     : buttons_{Button{12U}, Button{14U}, Button{5U}},
-      relays_{Relay{4U}, Relay{13U}, Relay{15U}} {}
+      relays_{Relay{4U}, Relay{13U}, Relay{15U}} {
+
+  static_assert(sizeof(Button3GearConfig) <= sizeof(Persistent::gearConfig));
+  memcpy(&config_, gearConfig, sizeof(Button3GearConfig));
+  Serial.print("config = ");
+  Serial.println(config_.buttonRelayconnectivity);
+}
 
 Button3Gear::Button3GearInstance *Button3Gear::Button3GearInstance::instance_ =
     nullptr;
 
-IGearInstance *Button3Gear::getInstance() const {
-  return Button3GearInstance::getInstance();
+IGearInstance *Button3Gear::getInstance(const std::uint8_t *gearConfig) const {
+  return Button3GearInstance::getInstance(gearConfig);
 }
 
 Button3Gear::Button3GearInstance *
-Button3Gear::Button3GearInstance::getInstance(void) {
+Button3Gear::Button3GearInstance::getInstance(const std::uint8_t *gearConfig) {
   if (instance_ == nullptr) {
-    instance_ = new Button3Gear::Button3GearInstance();
+    instance_ = new Button3Gear::Button3GearInstance(gearConfig);
   }
   return instance_;
 }
@@ -34,6 +41,10 @@ void Button3Gear::Button3GearInstance::setup() {
     buttons_[i].onPushDown([this, i]() {
       Serial.print(i);
       Serial.println(" button pushed down");
+      // check connectivity
+      if (this->config_.buttonRelayconnectivity & (1 << i)) {
+        this->relays_[i].toggle();
+      }
       userActionPayload_[0] = 0;
       userActionPayload_[1] = i;
       userActionCallback_(userActionPayload_);

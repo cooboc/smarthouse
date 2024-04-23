@@ -57,7 +57,8 @@ void Configuration::begin() {
     std::strcpy(persistent_.wifiSsid, "astrolek");
     std::strcpy(persistent_.wifiPassword, "rootroot");
     std::strcpy(persistent_.serverAddr, "10.1.99.60");
-    persistent_.gearTypeId = 1U; // set to 3 button
+    persistent_.gearTypeId = 1U;    // set to 3 button
+    persistent_.gearConfig[0] = 3U; // connect button 0 & 1
     writeToEEPROM();
   } else {
     Serial.println("EEPROM good!");
@@ -79,7 +80,7 @@ void Configuration::begin() {
   if ((id >= 0U) && (id < gearList_.size())) {
     const IGear *gear = gearList_.at(id);
     if (gear != nullptr) {
-      gearInstance_ = gear->getInstance();
+      gearInstance_ = gear->getInstance(persistent_.gearConfig);
     }
   }
 }

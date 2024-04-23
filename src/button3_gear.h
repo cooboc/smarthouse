@@ -12,13 +12,14 @@ class Button3Gear : public IGear {
 public:
   Button3Gear();
   virtual ~Button3Gear() {}
-  virtual const char *getName() const;
-  virtual IGearInstance *getInstance() const;
+  virtual const char *getName() const override;
+  virtual IGearInstance *
+  getInstance(const std::uint8_t *gearConfig) const override;
 
 private:
   class Button3GearInstance : public IGearInstance {
   public:
-    static Button3GearInstance *getInstance(void);
+    static Button3GearInstance *getInstance(const std::uint8_t *gearConfig);
 
     virtual void setup() override;
     virtual void tick() override;
@@ -26,12 +27,17 @@ private:
     virtual void onServerRequest(ServerRequest req) override;
 
   private:
+    struct Button3GearConfig {
+      std::uint8_t buttonRelayconnectivity;
+    };
+
     std::array<Button, 3U> buttons_;
     std::array<Relay, 3U> relays_;
     std::uint8_t userActionPayload_[2];
+    Button3GearConfig config_;
 
     static Button3GearInstance *instance_;
-    Button3GearInstance();
+    Button3GearInstance(const std::uint8_t *gearConfig);
   };
 };
 } // namespace cooboc

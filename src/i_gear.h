@@ -29,7 +29,9 @@ public:
   virtual ~IGear() {}
   virtual const char *getName() const = 0;
 
-  virtual IGearInstance *getInstance() const { return nullptr; };
+  virtual IGearInstance *getInstance(const std::uint8_t *gearConfig) const {
+    return nullptr;
+  };
 };
 } // namespace cooboc
 
