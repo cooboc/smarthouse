@@ -36,6 +36,8 @@ Button3Gear::Button3GearInstance::getInstance(const std::uint8_t *gearConfig) {
 }
 
 void Button3Gear::Button3GearInstance::setup() {
+  Serial.print("Button3Gear connectivity: ");
+  Serial.println(static_cast<uint32_t>(config_.buttonRelayconnectivity));
   for (std::size_t i{0U}; i < buttons_.size(); ++i) {
     buttons_[i].setup();
     buttons_[i].onPushDown([this, i]() {

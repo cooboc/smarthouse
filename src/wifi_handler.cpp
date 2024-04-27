@@ -1,5 +1,6 @@
 #include "wifi_handler.h"
 #include "data_def.h"
+#include <ArduinoOTA.h>
 
 namespace cooboc {
 
@@ -7,7 +8,7 @@ namespace {} // namespace
 
 WifiHandler::WifiHandler(Configuration &configuration)
     : configuration_(configuration), webPortal_{configuration},
-      isWebPortalStarted_{false} {}
+      isWebPortalStarted_{false}, isOtaStarted_{false} {}
 
 void WifiHandler::startConnectAp(const char *ssid, const char *password) const {
   // TODO need to check current status, stop current status
@@ -52,6 +53,30 @@ WifiHandler::WifiStatus WifiHandler::getWifiStatus() const {
   }
 }
 
+void WifiHandler::startOtaServer() {
+  ArduinoOTA.onStart([]() {
+    String type{ArduinoOTA.getCommand() == U_FLASH ? "sketch" : "filesystem"};
+    Serial.println("OTA Start updating " + type);
+  });
+  ArduinoOTA.onEnd([]() { Serial.println("OTA End"); });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) {
+      Serial.println("Auth Failed");
+    } else if (error == OTA_BEGIN_ERROR) {
+      Serial.println("Begin Failed");
+    } else if (error == OTA_CONNECT_ERROR) {
+      Serial.println("Connect Failed");
+    } else if (error == OTA_RECEIVE_ERROR) {
+      Serial.println("Receive Failed");
+    } else if (error == OTA_END_ERROR) {
+      Serial.println("End Failed");
+    }
+  });
+  ArduinoOTA.begin();
+  isOtaStarted_ = true;
+}
+
 void WifiHandler::startWebPortal() {
   Serial.println("ready to start web portal");
   Serial.print("AP name");
@@ -71,6 +96,9 @@ void WifiHandler::startWebPortal() {
 void WifiHandler::tick() {
   if (isWebPortalStarted_) {
     webPortal_.tick();
+  }
+  if (isOtaStarted_) {
+    ArduinoOTA.handle();
   }
 }
 

@@ -81,7 +81,7 @@ void RompClient::end() {}
 
 void RompClient::onSocketConnected(void) {
   status_ = Status::CONNECTED;
-  Serial.println("connected to server");
+  Serial.println("connected to server, hahahahah");
 }
 
 void RompClient::onSocketData(void *data, size_t len) {

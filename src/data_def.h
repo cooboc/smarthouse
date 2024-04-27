@@ -13,7 +13,7 @@ constexpr std::uint16_t WEB_PORT{80U};
 constexpr std::uint16_t DNS_PORT{53};
 
 // Change this value if you want to invalidate Flash
-constexpr std::uint8_t CLEAN_FLASH_VALUE{4U};
+constexpr std::uint8_t CLEAN_FLASH_VALUE{5U};
 
 struct Persistent {
   char wifiSsid[64] = {0};

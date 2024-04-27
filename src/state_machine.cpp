@@ -87,7 +87,10 @@ void StateMachine::transitTo(State newState) {
     break;
   }
   case (State::WORKING_WITH_WIFI): {
+    Serial.print("IP address: ");
+    Serial.println(wifi_.getLocalIP());
     rompClient_.begin();
+    wifi_.startOtaServer();
     break;
   }
   default: {
