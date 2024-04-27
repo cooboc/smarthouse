@@ -3,6 +3,7 @@
 
 #include "button.h"
 #include "i_gear.h"
+#include "led.h"
 #include "relay.h"
 #include <array>
 #include <functional>
@@ -33,6 +34,7 @@ private:
 
     std::array<Button, 3U> buttons_;
     std::array<Relay, 3U> relays_;
+    std::array<Led, 1U> leds_;
     std::uint8_t userActionPayload_[2];
     Button3GearConfig config_;
 

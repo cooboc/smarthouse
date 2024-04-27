@@ -12,7 +12,7 @@ const char *Button3Gear::getName() const { return GEAR_NAME; }
 Button3Gear::Button3GearInstance::Button3GearInstance(
     const std::uint8_t *gearConfig)
     : buttons_{Button{12U}, Button{14U}, Button{5U}},
-      relays_{Relay{4U}, Relay{13U}, Relay{15U}} {
+      relays_{Relay{4U}, Relay{13U}, Relay{15U}}, leds_{Led{2U, true}} {
 
   static_assert(sizeof(Button3GearConfig) <= sizeof(Persistent::gearConfig));
   memcpy(&config_, gearConfig, sizeof(Button3GearConfig));
@@ -38,11 +38,16 @@ Button3Gear::Button3GearInstance::getInstance(const std::uint8_t *gearConfig) {
 void Button3Gear::Button3GearInstance::setup() {
   Serial.print("Button3Gear connectivity: ");
   Serial.println(static_cast<uint32_t>(config_.buttonRelayconnectivity));
+
+  std::for_each(leds_.begin(), leds_.end(), [](Led &l) { l.setup(); });
+  std::for_each(relays_.begin(), relays_.end(), [](Relay &r) { r.setup(); });
+
   for (std::size_t i{0U}; i < buttons_.size(); ++i) {
     buttons_[i].setup();
     buttons_[i].onPushDown([this, i]() {
       Serial.print(i);
       Serial.println(" button pushed down");
+      this->leds_[0].set(true);
       // check connectivity
       if (this->config_.buttonRelayconnectivity & (1 << i)) {
         this->relays_[i].toggle();
@@ -51,9 +56,7 @@ void Button3Gear::Button3GearInstance::setup() {
       userActionPayload_[1] = i;
       userActionCallback_(userActionPayload_);
     });
-  }
-  for (std::size_t i{0U}; i < relays_.size(); ++i) {
-    relays_[i].setup();
+    buttons_[i].onPushUp([this, i]() { this->leds_[0].set(false); });
   }
 }
 

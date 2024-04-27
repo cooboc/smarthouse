@@ -8,6 +8,8 @@
 namespace cooboc {
 class Button {
 public:
+  using EventCallback = std::function<void(void)>;
+
   Button(std::uint8_t pin);
   Button(const Button &&b);
   Button(const Button &) = delete;
@@ -17,9 +19,8 @@ public:
   void setup();
   void tick();
   bool isPushed() const;
-  void onPushDown(std::function<void(void)> callback) {
-    pushDownCallback_ = callback;
-  }
+  void onPushDown(EventCallback callback) { pushDownCallback_ = callback; }
+  void onPushUp(EventCallback callback) { pushUpCallback_ = callback; }
 
 private:
   std::uint8_t pin_;
@@ -30,7 +31,8 @@ private:
 
   unsigned long clickStartTime_;
 
-  std::function<void(void)> pushDownCallback_ = []() {};
+  EventCallback pushDownCallback_ = []() {};
+  EventCallback pushUpCallback_ = []() {};
 
   void behaviourDetector(int currentValue);
 };

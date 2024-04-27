@@ -7,12 +7,14 @@ constexpr unsigned long CLICK_TIME_THRESHOLD{400U};
 
 Button::Button(std::uint8_t pin)
     : pin_{pin}, initValue_{1}, lastValue_{1}, debouncingValue_{1},
-      debouncingTime_{0U}, clickStartTime_{0U}, pushDownCallback_{[]() {}} {}
+      debouncingTime_{0U}, clickStartTime_{0U}, pushDownCallback_{[]() {}},
+      pushUpCallback_{[]() {}} {}
 
 Button::Button(const Button &&b)
     : pin_{b.pin_}, initValue_{b.initValue_}, lastValue_{b.lastValue_},
       debouncingTime_{b.debouncingTime_}, debouncingValue_{b.debouncingValue_},
-      clickStartTime_{0U}, pushDownCallback_{b.pushDownCallback_} {}
+      clickStartTime_{0U}, pushDownCallback_{b.pushDownCallback_},
+      pushUpCallback_{b.pushUpCallback_} {}
 
 void Button::setup() {
   pinMode(pin_, INPUT_PULLUP);
@@ -51,8 +53,9 @@ bool Button::isPushed() const { return lastValue_ != initValue_; }
 
 void Button::behaviourDetector(int currentValue) {
   if (currentValue == initValue_) {
-    Serial.println("realsed");
     // relased
+    Serial.println("realsed");
+    pushUpCallback_();
     if ((millis() - clickStartTime_) < CLICK_TIME_THRESHOLD) {
       Serial.println("clicked");
     } else {
