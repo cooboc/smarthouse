@@ -12,7 +12,8 @@ const char *Button3Gear::getName() const { return GEAR_NAME; }
 Button3Gear::Button3GearInstance::Button3GearInstance(
     const std::uint8_t *gearConfig)
     : buttons_{Button{12U}, Button{14U}, Button{5U}},
-      relays_{Relay{4U}, Relay{13U}, Relay{15U}}, leds_{Led{2U, true}} {
+      relays_{Relay{4U}, Relay{13U}, Relay{15U}}, leds_{Led{2U, true}},
+      isReadyRestart_{false} {
 
   static_assert(sizeof(Button3GearConfig) <= sizeof(Persistent::gearConfig));
   memcpy(&config_, gearConfig, sizeof(Button3GearConfig));
@@ -58,12 +59,27 @@ void Button3Gear::Button3GearInstance::setup() {
     });
     buttons_[i].onPushUp([this, i]() { this->leds_[0].set(false); });
   }
+
+  // first button as the restart button
+
+  buttons_[0].onRestartSatisfied([this]() {
+    Serial.println("Restart Ready.");
+    this->leds_[0].startFastBlink();
+    this->isReadyRestart_ = true;
+  });
+
+  buttons_[0].onPushUp([this]() {
+    this->leds_[0].set(false);
+    if (this->isReadyRestart_) {
+      Serial.println("Bye.");
+      ESP.restart();
+    }
+  });
 }
 
 void Button3Gear::Button3GearInstance::tick() {
-  for (Button &b : buttons_) {
-    b.tick();
-  }
+  std::for_each(leds_.begin(), leds_.end(), [](Led &l) { l.tick(); });
+  std::for_each(buttons_.begin(), buttons_.end(), [](Button &b) { b.tick(); });
 }
 
 void Button3Gear::Button3GearInstance::fillStatus(std::uint8_t *buffer) const {

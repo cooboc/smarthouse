@@ -1,6 +1,7 @@
 #ifndef __BUTTON_H__
 #define __BUTTON_H__
 
+#include "utils.h"
 #include <Arduino.h>
 #include <cstdio>
 #include <functional>
@@ -21,6 +22,9 @@ public:
   bool isPushed() const;
   void onPushDown(EventCallback callback) { pushDownCallback_ = callback; }
   void onPushUp(EventCallback callback) { pushUpCallback_ = callback; }
+  void onRestartSatisfied(EventCallback callback) {
+    restartCallback_ = callback;
+  }
 
 private:
   std::uint8_t pin_;
@@ -28,13 +32,15 @@ private:
   int lastValue_;
   int debouncingValue_;
   unsigned long debouncingTime_;
-
   unsigned long clickStartTime_;
+  bool isRestartTriggered_;
 
-  EventCallback pushDownCallback_ = []() {};
-  EventCallback pushUpCallback_ = []() {};
+  EventCallback pushDownCallback_ = utils::EMPTY_FUNCTION;
+  EventCallback pushUpCallback_ = utils::EMPTY_FUNCTION;
+  EventCallback restartCallback_ = utils::EMPTY_FUNCTION;
 
-  void behaviourDetector(int currentValue);
+  void flipFlopBehaviourDetector(int currentValue);
+  void holdingBehaviourDetector(int currentValue);
 };
 } // namespace cooboc
 

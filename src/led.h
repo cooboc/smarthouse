@@ -16,11 +16,16 @@ public:
   void tick();
 
   void set(bool status);
+  void startFastBlink();
 
 private:
   std::uint8_t pin_;
   bool status_;
   bool reversed_;
+  unsigned long animationStartTime_;
+
+  enum class AnimationStatus : std::uint8_t { SOLID, FAST_BLINKING };
+  AnimationStatus animationStatus_;
 };
 } // namespace cooboc
 

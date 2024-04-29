@@ -28,5 +28,7 @@ void writeUint8(const std::uint8_t value, std::uint8_t *dataPtr) {
   *dataPtr = value;
 }
 
+std::function<void(void)> EMPTY_FUNCTION = []() {};
+
 } // namespace utils
 } // namespace cooboc

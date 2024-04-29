@@ -37,6 +37,7 @@ private:
     std::array<Led, 1U> leds_;
     std::uint8_t userActionPayload_[2];
     Button3GearConfig config_;
+    bool isReadyRestart_;
 
     static Button3GearInstance *instance_;
     Button3GearInstance(const std::uint8_t *gearConfig);
