@@ -25,6 +25,7 @@ public:
   void onRestartSatisfied(EventCallback callback) {
     restartCallback_ = callback;
   }
+  void onResetSatified(EventCallback callback) { resetCallback_ = callback; }
 
 private:
   std::uint8_t pin_;
@@ -34,10 +35,12 @@ private:
   unsigned long debouncingTime_;
   unsigned long clickStartTime_;
   bool isRestartTriggered_;
+  bool isResetTriggered_;
 
   EventCallback pushDownCallback_ = utils::EMPTY_FUNCTION;
   EventCallback pushUpCallback_ = utils::EMPTY_FUNCTION;
   EventCallback restartCallback_ = utils::EMPTY_FUNCTION;
+  EventCallback resetCallback_ = utils::EMPTY_FUNCTION;
 
   void flipFlopBehaviourDetector(int currentValue);
   void holdingBehaviourDetector(int currentValue);

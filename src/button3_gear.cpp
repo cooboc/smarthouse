@@ -13,7 +13,7 @@ Button3Gear::Button3GearInstance::Button3GearInstance(
     const std::uint8_t *gearConfig)
     : buttons_{Button{12U}, Button{14U}, Button{5U}},
       relays_{Relay{4U}, Relay{13U}, Relay{15U}}, leds_{Led{2U, true}},
-      isReadyRestart_{false} {
+      isReadyRestart_{false}, isReadyReset_{false} {
 
   static_assert(sizeof(Button3GearConfig) <= sizeof(Persistent::gearConfig));
   memcpy(&config_, gearConfig, sizeof(Button3GearConfig));
@@ -68,11 +68,22 @@ void Button3Gear::Button3GearInstance::setup() {
     this->isReadyRestart_ = true;
   });
 
+  buttons_[0].onResetSatified([this]() {
+    Serial.println("Reset Ready.");
+    this->leds_[0].set(true);
+    this->isReadyRestart_ = false;
+    this->isReadyReset_ = true;
+  });
+
   buttons_[0].onPushUp([this]() {
     this->leds_[0].set(false);
-    if (this->isReadyRestart_) {
+    if (this->isReadyReset_) {
+      this->resetPushedCallback_();
+      this->isReadyReset_ = false;
+    } else if (this->isReadyRestart_) {
       Serial.println("Bye.");
       ESP.restart();
+      this->isReadyRestart_ = false;
     }
   });
 }

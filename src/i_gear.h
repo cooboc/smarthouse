@@ -2,6 +2,7 @@
 #define __I_GEAR_H__
 
 #include "data_def.h"
+#include "utils.h"
 #include <cstdint>
 #include <functional>
 #include <vector>
@@ -9,6 +10,7 @@
 namespace cooboc {
 
 using UserActionCallback = std::function<void(void *)>;
+using EventCallback = std::function<void(void)>;
 
 class IGearInstance {
 public:
@@ -18,10 +20,14 @@ public:
   virtual void onUserAction(UserActionCallback callback) {
     userActionCallback_ = callback;
   }
+  virtual void onResetPushed(EventCallback callback) {
+    resetPushedCallback_ = callback;
+  }
   virtual void onServerRequest(ServerRequest req) {}
 
 protected:
   UserActionCallback userActionCallback_ = [](void *) {};
+  EventCallback resetPushedCallback_ = utils::EMPTY_FUNCTION;
 };
 
 class IGear {

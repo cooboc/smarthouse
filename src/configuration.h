@@ -27,6 +27,7 @@ public:
   void updateServerAddr(const char *serverAddr);
   void updateGearTypeId(std::uint8_t id);
   void commitUpdate();
+  void resetSettings();
 
   bool isWifiCredentialExists() const {
     return (std::strlen(persistent_.wifiSsid) > 0);

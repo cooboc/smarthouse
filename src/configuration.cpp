@@ -173,4 +173,9 @@ void Configuration::updateGearTypeId(const std::uint8_t id) {
 }
 void Configuration::commitUpdate() { writeToEEPROM(); }
 
+void Configuration::resetSettings() {
+  persistent_.reset();
+  commitUpdate();
+}
+
 } // namespace cooboc

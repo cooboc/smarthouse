@@ -20,6 +20,11 @@ void setup() {
   cooboc::IGearInstance *gear = configuration.getGearInstance();
   if (gear != nullptr) {
     gear->setup();
+    gear->onResetPushed([]() {
+      Serial.println("user push reset");
+      configuration.resetSettings();
+      ESP.restart();
+    });
   } else {
     Serial.println("[WARN] gear instance null");
   }
