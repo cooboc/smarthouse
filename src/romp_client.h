@@ -34,7 +34,7 @@ private:
     IDLE,
     CONNECTING,
     CONNECTED,
-    BAD,
+    DISCONNECTED,
   };
 
   enum class PakcetType : std::uint8_t {
@@ -45,6 +45,7 @@ private:
   AsyncClient *socketClient_{nullptr};
   Status status_{Status::IDLE};
   std::uint32_t lastHeartbeatTime_{0UL};
+  std::uint32_t lastConnectFailedTime_{0UL};
 
   RompParser parser_;
 
@@ -57,6 +58,8 @@ private:
 
   void onSocketConnected();
   void onSocketData(void *data, size_t len);
+  void onConnectFailed(void *arg, AsyncClient *ac, err_t error);
+  void onDisconnect(void *arg, AsyncClient *ac);
   void sendHeartbeat();
 };
 
