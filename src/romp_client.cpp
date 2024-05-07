@@ -20,7 +20,7 @@ RompClient::RompClient(const Configuration &configuration)
   utils::writeUint8(typeId, packetBuffer_ + 7);
 }
 
-void RompClient::begin() {
+void RompClient::init() {
   socketClient_ = new AsyncClient();
   socketClient_->setAckTimeout(400U);
   socketClient_->setRxTimeout(5U);
@@ -44,23 +44,6 @@ void RompClient::begin() {
       this);
   //   socketClient_->onTimeout(onTimeoutCallback, this);
   //   socketClient_->onPoll(onPollCallback, this);
-  socketClient_->connect(configuration_.getServerAddr(), 8114);
-  status_ = Status::CONNECTING;
-
-  Serial.print("ready to connect server: ");
-  Serial.print(configuration_.getServerAddr());
-  Serial.println(":8114");
-
-  auto gearPtr = configuration_.getGearInstance();
-  if (gearPtr != nullptr) {
-    gearPtr->onUserAction([this](void *payload) {
-      std::memcpy(packetBuffer_ + detail::PACKET_HEAD_LENGTH, payload, 2U);
-
-      socketClient_->write((const char *)packetBuffer_,
-                           detail::PACKET_HEAD_LENGTH +
-                               detail::PACKET_BODY_LENGTH);
-    });
-  }
 }
 
 void RompClient::tick() {
@@ -110,7 +93,25 @@ void RompClient::sendHeartbeat() {
   // socketClient_->write("Hello world!", std::strlen("Hello world!"));
 }
 
-void RompClient::end() {}
+void RompClient::start() {
+  socketClient_->connect(configuration_.getServerAddr(), 8114);
+  status_ = Status::CONNECTING;
+  Serial.print("ready to connect server: ");
+  Serial.print(configuration_.getServerAddr());
+  Serial.println(":8114");
+
+  auto gearPtr = configuration_.getGearInstance();
+  if (gearPtr != nullptr) {
+    gearPtr->onUserAction([this](void *payload) {
+      std::memcpy(packetBuffer_ + detail::PACKET_HEAD_LENGTH, payload, 2U);
+
+      socketClient_->write((const char *)packetBuffer_,
+                           detail::PACKET_HEAD_LENGTH +
+                               detail::PACKET_BODY_LENGTH);
+    });
+  }
+}
+void RompClient::stop() {}
 
 void RompClient::onSocketConnected(void) {
   status_ = Status::CONNECTED;

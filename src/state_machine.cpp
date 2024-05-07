@@ -17,7 +17,7 @@ StateMachine::StateMachine(const Configuration &configuration,
 
 void StateMachine::begin() {
   Serial.println("begin state machine");
-
+  rompClient_.init();
   if (configuration_.isWifiCredentialExists()) {
     transitTo(State::CONNECTING);
   } else {
@@ -41,11 +41,10 @@ void StateMachine::tick() {
     break;
   }
   case (State::WORKING_WITH_WIFI): {
+    rompClient_.tick();
     if (wifiStatus != WifiHandler::WifiStatus::CONNECTED) {
       transitOut();
       transitTo(State::CONNECTING);
-    } else {
-      rompClient_.tick();
     }
     break;
   }
@@ -58,7 +57,7 @@ void StateMachine::tick() {
 void StateMachine::transitOut() {
   switch (state_) {
   case (State::WORKING_WITH_WIFI): {
-    rompClient_.end();
+    rompClient_.stop();
     break;
   }
   default: {
@@ -89,7 +88,7 @@ void StateMachine::transitTo(State newState) {
   case (State::WORKING_WITH_WIFI): {
     Serial.print("IP address: ");
     Serial.println(wifi_.getLocalIP());
-    rompClient_.begin();
+    rompClient_.start();
     wifi_.startOtaServer();
     break;
   }
@@ -111,6 +110,11 @@ void StateMachine::handleConnectingTick(
   case (WifiHandler::WifiStatus::CONNECTED): {
     transitOut();
     transitTo(State::WORKING_WITH_WIFI);
+    break;
+  }
+  case (WifiHandler::WifiStatus::WRONG_AP): {
+    // cool down and connect again
+    // just wait for connecting
     break;
   }
   default: {

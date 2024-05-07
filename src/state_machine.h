@@ -14,7 +14,6 @@ public:
     CONFIG_PORTAL,
     CONNECTING,
     WORKING_WITH_WIFI,
-
   };
 
   StateMachine(const Configuration &configruation, WifiHandler &wifi,

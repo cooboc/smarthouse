@@ -45,6 +45,9 @@ WifiHandler::WifiStatus WifiHandler::getWifiStatus() const {
   case (WL_CONNECTED): {
     return WifiStatus::CONNECTED;
   }
+  case (WL_NO_SSID_AVAIL): {
+    return WifiStatus::WRONG_AP;
+  }
   default:
     Serial.print("unknown status: ");
     Serial.println((int)(status));

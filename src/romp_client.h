@@ -25,9 +25,10 @@ public:
   using ServerRequestCallback = std::function<void(ServerRequest)>;
 
   RompClient(const Configuration &configuration);
-  void begin();
+  void init();
   void tick();
-  void end();
+  void start();
+  void stop();
 
 private:
   enum class Status : std::uint8_t {
