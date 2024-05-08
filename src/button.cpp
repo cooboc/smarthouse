@@ -5,8 +5,8 @@
 namespace cooboc {
 
 constexpr unsigned long CLICK_TIME_THRESHOLD{400U};
-constexpr unsigned long RESTART_TIME_THRESHOLD{2000u};
-constexpr unsigned long RESET_TIME_THRESHOLD{3000u};
+constexpr unsigned long RESTART_TIME_THRESHOLD{15000U};
+constexpr unsigned long RESET_TIME_THRESHOLD{30000U};
 
 Button::Button(std::uint8_t pin)
     : pin_{pin}, initValue_{1}, lastValue_{1}, debouncingValue_{1},

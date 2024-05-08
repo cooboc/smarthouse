@@ -93,7 +93,8 @@ void Button3Gear::Button3GearInstance::tick() {
   std::for_each(buttons_.begin(), buttons_.end(), [](Button &b) { b.tick(); });
 }
 
-void Button3Gear::Button3GearInstance::fillStatus(std::uint8_t *buffer) const {
+void Button3Gear::Button3GearInstance::fillStatus(std::uint8_t *buffer,
+                                                  std::size_t) const {
   std::uint8_t statusByte{0U};
   for (std::size_t i{0U}; i < buttons_.size(); ++i) {
     statusByte <<= 1;

@@ -16,7 +16,7 @@ class IGearInstance {
 public:
   virtual void setup() = 0;
   virtual void tick() = 0;
-  virtual void fillStatus(std::uint8_t *buffer) const = 0;
+  virtual void fillStatus(std::uint8_t *buffer, std::size_t length) const = 0;
   virtual void onUserAction(UserActionCallback callback) {
     userActionCallback_ = callback;
   }

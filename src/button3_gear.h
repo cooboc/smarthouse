@@ -24,7 +24,8 @@ private:
 
     virtual void setup() override;
     virtual void tick() override;
-    virtual void fillStatus(std::uint8_t *buffer) const override;
+    virtual void fillStatus(std::uint8_t *buffer,
+                            std::size_t length) const override;
     virtual void onServerRequest(ServerRequest req) override;
 
   private:

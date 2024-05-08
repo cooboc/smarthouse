@@ -5,6 +5,11 @@
 
 namespace cooboc {
 
+namespace {
+constexpr std::size_t PACKET_OFFSET_SEQUENCE{8U};
+constexpr std::size_t PACKET_OFFSET_TYPE{9U};
+} // namespace
+
 constexpr static std::uint32_t RECONNECT_SERVER_TIME{2000UL};
 
 RompClient::RompClient(const Configuration &configuration)
@@ -68,7 +73,7 @@ void RompClient::tick() {
     if ((millis() - lastConnectFailedTime_) > RECONNECT_SERVER_TIME) {
       Serial.println("reconnect server");
       status_ = Status::CONNECTING;
-      socketClient_->connect(configuration_.getServerAddr(), 8114);
+      socketClient_->connect(configuration_.getServerAddr(), 8113);
     }
   }
   default: {
@@ -77,38 +82,17 @@ void RompClient::tick() {
   }
 }
 
-void RompClient::sendHeartbeat() {
-  packetBuffer_[detail::PACKET_HEAD_LENGTH] =
-      static_cast<std::underlying_type_t<PakcetType>>(PakcetType::HEARTBEAT);
-  auto gearPtr = configuration_.getGearInstance();
-  if (gearPtr == nullptr) {
-    packetBuffer_[detail::PACKET_HEAD_LENGTH + 1U] = 0U;
-  } else {
-    gearPtr->fillStatus(packetBuffer_ + detail::PACKET_HEAD_LENGTH + 1U);
-  }
-
-  socketClient_->write((const char *)packetBuffer_,
-                       detail::PACKET_HEAD_LENGTH + detail::PACKET_BODY_LENGTH);
-
-  // socketClient_->write("Hello world!", std::strlen("Hello world!"));
-}
-
 void RompClient::start() {
-  socketClient_->connect(configuration_.getServerAddr(), 8114);
+  socketClient_->connect(configuration_.getServerAddr(), 8113);
   status_ = Status::CONNECTING;
   Serial.print("ready to connect server: ");
   Serial.print(configuration_.getServerAddr());
-  Serial.println(":8114");
+  Serial.println(":8113");
 
   auto gearPtr = configuration_.getGearInstance();
   if (gearPtr != nullptr) {
-    gearPtr->onUserAction([this](void *payload) {
-      std::memcpy(packetBuffer_ + detail::PACKET_HEAD_LENGTH, payload, 2U);
-
-      socketClient_->write((const char *)packetBuffer_,
-                           detail::PACKET_HEAD_LENGTH +
-                               detail::PACKET_BODY_LENGTH);
-    });
+    gearPtr->onUserAction(
+        [this](void *payload) { this->onUserAction(payload); });
   }
 }
 void RompClient::stop() {}
@@ -140,6 +124,43 @@ void RompClient::onSocketData(void *data, size_t len) {
       gearPtr->onServerRequest(opt.data);
     }
   }
+}
+
+void RompClient::sendHeartbeat() {
+  // Set the packet type
+  packetBuffer_[PACKET_OFFSET_TYPE] = utils::valueOf(PacketType::HEARTBEAT);
+
+  // get the payload of heartbeat
+  auto gearPtr = configuration_.getGearInstance();
+  if (gearPtr == nullptr) {
+    // fill zero
+    memset(packetBuffer_ + detail::PACKET_HEAD_LENGTH, 0U,
+           detail::PACKET_PAYLOAD_LENGTH);
+  } else {
+    gearPtr->fillStatus(packetBuffer_ + detail::PACKET_HEAD_LENGTH,
+                        detail::PACKET_PAYLOAD_LENGTH);
+  }
+
+  sendPacket();
+}
+
+void RompClient::onUserAction(void *payload) {
+  // Set packet type
+  packetBuffer_[PACKET_OFFSET_TYPE] = utils::valueOf(PacketType::USER_EVENT);
+
+  // Payload
+  std::memcpy(packetBuffer_ + detail::PACKET_HEAD_LENGTH, payload,
+              detail::PACKET_PAYLOAD_LENGTH);
+  sendPacket();
+}
+
+void RompClient::sendPacket() {
+  packetSeq_++;
+  packetBuffer_[PACKET_OFFSET_SEQUENCE] = packetSeq_;
+
+  socketClient_->write((const char *)packetBuffer_,
+                       detail::PACKET_HEAD_LENGTH +
+                           detail::PACKET_PAYLOAD_LENGTH);
 }
 
 } // namespace cooboc
