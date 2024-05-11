@@ -422,14 +422,17 @@ app.get("/control", (req: express.Request, res: express.Response): void => {
         outputId: 2,
     },
     {
+        // 2楼阳台灯
         deviceId: 3,
         gearId: 1010196,
         outputId: 0,
     }, {
+        // 2楼客厅灯
         deviceId: 4,
         gearId: 1010196,
         outputId: 1,
     }, {
+        // 楼梯灯
         deviceId: 5,
         gearId: 1010196,
         outputId: 2,
@@ -446,6 +449,7 @@ app.get("/control", (req: express.Request, res: express.Response): void => {
             clientPool_.requestOutput(matchedDevice.gearId, matchedDevice.outputId, status ? 1 : 0);
         }
     }
+    res.status(200).send("OK");
 });
 
 app.listen(3000, (): void => {
