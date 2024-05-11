@@ -113,15 +113,25 @@ void Button3Gear::Button3GearInstance::fillStatus(std::uint8_t *buffer,
   buffer[1] = statusByte;
 }
 
-void Button3Gear::Button3GearInstance::onServerRequest(ServerRequest req) {
+void Button3Gear::Button3GearInstance::onServerRequest(
+    const ServerRequest &req) {
   Serial.println("handle server here");
-  const std::uint8_t portId = req.portId;
-  if (portId >= relays_.size()) {
-    return;
+  // type
+  const std::uint8_t requestType = req[0];
+  if (requestType == 0x01) { // Change status
+    const std::uint8_t &portMask = req[1];
+    const std::uint8_t &valueList = req[2];
+    for (std::size_t i{0U}; i < relays_.size(); ++i) {
+      if ((portMask & (1U << i)) != 0U) {
+        const bool status = (valueList & (1U << i)) != 0U;
+        relays_[i].set(status);
+        Serial.print("server set ");
+        Serial.print((int)(i));
+        Serial.print(" to ");
+        Serial.println((int)status);
+      }
+    }
   }
-  const bool status = req.request == ServerRequest::RequestType::RELAY_ON;
-
-  relays_[portId].set(status);
 }
 
 } // namespace cooboc

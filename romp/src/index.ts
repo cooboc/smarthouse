@@ -91,10 +91,10 @@ class TestGear implements IGear {
 class Button3Gear implements IGear {
     readonly REQUEST_CHANGE_STATUS: number = 0x01;
 
-    private readonly id_: number;
+    private readonly chipId_: number;
     private readonly outputs_: GearOutput[];
-    constructor(id: number) {
-        this.id_ = id;
+    constructor(chipId: number) {
+        this.chipId_ = chipId;
         this.outputs_ = [new GearOutput(0), new GearOutput(1), new GearOutput(2)];
     }
     handlePacket: (packetType: number, payload: Buffer) => void = (packetType: number, payload: Buffer) => {
@@ -102,7 +102,7 @@ class Button3Gear implements IGear {
             case (PACKET_TYPE_HEARTBEAT): {
                 const buttonsStatus: number = payload.readUint8(0);
                 const relaysStatus: number = payload.readUint8(1);
-                console.log("Button status, ", this.id_, buttonsStatus, relaysStatus);
+                console.log("Button status, ", this.chipId_, buttonsStatus, relaysStatus);
                 break;
             }
             case (PACKET_TYPE_USER_EVENT): {
@@ -126,8 +126,8 @@ class Button3Gear implements IGear {
         const buffer: Buffer = Buffer.alloc(10);
         buffer.fill(0);
         buffer[0] = this.REQUEST_CHANGE_STATUS;
-        buffer[1] = 1 << this.id_;
-        buffer[2] = (1 & status) << this.id_;
+        buffer[1] = 1 << output.getId();
+        buffer[2] = (1 & status) << output.getId();
         return buffer;
 
 
@@ -412,7 +412,29 @@ app.get("/control", (req: express.Request, res: express.Response): void => {
         deviceId: 0,
         gearId: 2090368,
         outputId: 0,
-    }];
+    }, {
+        deviceId: 1,
+        gearId: 2090368,
+        outputId: 1,
+    }, {
+        deviceId: 2,
+        gearId: 2090368,
+        outputId: 2,
+    },
+    {
+        deviceId: 3,
+        gearId: 1010196,
+        outputId: 0,
+    }, {
+        deviceId: 4,
+        gearId: 1010196,
+        outputId: 1,
+    }, {
+        deviceId: 5,
+        gearId: 1010196,
+        outputId: 2,
+    },];
+
 
 
 

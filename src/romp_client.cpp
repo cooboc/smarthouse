@@ -15,7 +15,7 @@ constexpr static std::uint32_t RECONNECT_SERVER_TIME{2000UL};
 RompClient::RompClient(const Configuration &configuration)
     : configuration_{configuration}, socketClient_{nullptr},
       status_{Status::IDLE}, lastHeartbeatTime_{0UL},
-      lastConnectFailedTime_{0UL}, packetSeq_{0U}, parser_{} {}
+      lastConnectFailedTime_{0UL}, packetSeq_{0U}, parser_{configuration} {}
 
 void RompClient::init() {
   // inflate packet buffer

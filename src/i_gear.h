@@ -23,7 +23,7 @@ public:
   virtual void onResetPushed(EventCallback callback) {
     resetPushedCallback_ = callback;
   }
-  virtual void onServerRequest(ServerRequest req) {}
+  virtual void onServerRequest(const ServerRequest &req) {}
 
 protected:
   UserActionCallback userActionCallback_ = [](void *) {};

@@ -43,18 +43,20 @@ template <typename T> struct optional {
   T data;
 };
 
-struct ServerRequest {
-  enum class RequestType : std::uint8_t {
-    RELAY_ON,
-    RELAY_OFF,
-    RELAY_ON_LOCK,
-    RELAY_OFF_LOCK,
-    INVALID,
-  };
+// struct ServerRequest {
+//   enum class RequestType : std::uint8_t {
+//     RELAY_ON,
+//     RELAY_OFF,
+//     RELAY_ON_LOCK,
+//     RELAY_OFF_LOCK,
+//     INVALID,
+//   };
 
-  std::uint8_t portId{0U};
-  RequestType request{RequestType::INVALID};
-};
+//   std::uint8_t portId{0U};
+//   RequestType request{RequestType::INVALID};
+// };
+
+using ServerRequest = std::uint8_t[10];
 
 } // namespace cooboc
 #endif
