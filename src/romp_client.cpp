@@ -15,17 +15,20 @@ constexpr static std::uint32_t RECONNECT_SERVER_TIME{2000UL};
 RompClient::RompClient(const Configuration &configuration)
     : configuration_{configuration}, socketClient_{nullptr},
       status_{Status::IDLE}, lastHeartbeatTime_{0UL},
-      lastConnectFailedTime_{0UL}, packetSeq_{0U}, parser_{} {
+      lastConnectFailedTime_{0UL}, packetSeq_{0U}, parser_{} {}
+
+void RompClient::init() {
+  // inflate packet buffer
   packetBuffer_[0] = 'A';
   packetBuffer_[1] = '5';
   packetBuffer_[2] = 1; // current protocol version
-  const uint32_t deviceId = configuration.getDeviceId();
+  const uint32_t deviceId = configuration_.getDeviceId();
   utils::writeUint32(deviceId, packetBuffer_ + 3);
-  const uint8_t typeId = configuration.getGearTypeId();
+  const uint8_t typeId = configuration_.getGearTypeId();
   utils::writeUint8(typeId, packetBuffer_ + 7);
-}
+  Serial.print("chipId: ");
+  Serial.println(deviceId);
 
-void RompClient::init() {
   socketClient_ = new AsyncClient();
   socketClient_->setAckTimeout(400U);
   socketClient_->setRxTimeout(5U);

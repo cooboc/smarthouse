@@ -17,6 +17,7 @@ std::uint16_t calculateCrc(std::uint8_t *dataPtr, std::size_t len) {
   return crc;
 }
 
+// little endian
 void writeUint32(const std::uint32_t value, std::uint8_t *dataPtr) {
   dataPtr[0] = (std::uint8_t)(value & 0x00FF);
   dataPtr[1] = (std::uint8_t)((value >> 8) & 0x00FF);

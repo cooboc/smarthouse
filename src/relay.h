@@ -11,6 +11,7 @@ public:
 
   void set(bool status);
   void toggle();
+  bool isClosed() const { return status_; }
 
 private:
   std::uint8_t pin_;

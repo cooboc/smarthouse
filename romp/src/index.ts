@@ -1,60 +1,300 @@
 import * as net from 'net';
+import express from "express";
+import { request } from 'http';
+import { match } from 'assert';
+import { stat } from 'fs';
+
+class Light {
+    constructor() {
+
+    }
+};
+
+class GearInput {
+    constructor() {
+
+    }
+};
+
+class GearOutput {
+    private readonly id_: number;
+    constructor(id: number) {
+        this.id_ = id;
+    }
+
+    readonly getId = (): number => {
+        return this.id_;
+    }
+};
+
+
+type RompPacket = {
+    version: number,
+    chipId: number,
+    gearType: number,
+    packetSeq: number,
+    packetType: number,
+    payload: Buffer
+};
+
+const ROMP_PROTOCOL_PREFIX: string = "A5";
+type NewPacketCallbcak = (packet: RompPacket) => void;
+class RompParser {
+
+    private newPacketCallback_: NewPacketCallbcak = () => { }
+    constructor() {
+
+    }
+
+    readonly parse = (data: Buffer): void => {
+        // 1. check head
+
+        const isHeadCorrect = (data[0] === ROMP_PROTOCOL_PREFIX.charCodeAt(0)) && (data[1] === ROMP_PROTOCOL_PREFIX.charCodeAt(1));
+        if (isHeadCorrect && data.length >= 20) {
+            const packet: RompPacket = {
+                version: data[2],
+                chipId: data.readUint32LE(3),
+                gearType: data[7],
+                packetSeq: data[8],
+                packetType: data[9],
+                payload: data.subarray(10, 20)
+            };
+            if ((packet.gearType < 0) || (packet.gearType >= GearGenes.length)) {
+                console.error("bad packet, invalid geartype");
+            } else {
+                this.newPacketCallback_(packet);
+            }
+        } else {
+            console.log("bad packet");
+        }
+    }
+
+    readonly onNewPacket = (callback: NewPacketCallbcak): void => {
+        this.newPacketCallback_ = callback;
+    }
+};
+
+const PACKET_TYPE_HEARTBEAT: number = 0x01;
+const PACKET_TYPE_USER_EVENT: number = 0x02;
+const PACKET_TYPE_REQUEST_GEAR: number = 0x03;
+
+interface IGear {
+    handlePacket: (packetType: number, payload: Buffer) => void;
+    generateOutputPayload: (outputPortId: number, status: number) => Buffer | undefined;
+};
+
+class TestGear implements IGear {
+    handlePacket = () => { }
+    generateOutputPayload = () => { return undefined };
+}
+
+class Button3Gear implements IGear {
+    readonly REQUEST_CHANGE_STATUS: number = 0x01;
+
+    private readonly id_: number;
+    private readonly outputs_: GearOutput[];
+    constructor(id: number) {
+        this.id_ = id;
+        this.outputs_ = [new GearOutput(0), new GearOutput(1), new GearOutput(2)];
+    }
+    handlePacket: (packetType: number, payload: Buffer) => void = (packetType: number, payload: Buffer) => {
+        switch (packetType) {
+            case (PACKET_TYPE_HEARTBEAT): {
+                const buttonsStatus: number = payload.readUint8(0);
+                const relaysStatus: number = payload.readUint8(1);
+                console.log("Button status, ", this.id_, buttonsStatus, relaysStatus);
+                break;
+            }
+            case (PACKET_TYPE_USER_EVENT): {
+                break;
+            }
+            default: {
+                console.error("unknown packet type", packetType);
+                break;
+            }
+        }
+    };
+
+    readonly generateOutputPayload: (outputPortId: number, status: number) => Buffer | undefined = (outputPortId: number, status: number): Buffer | undefined => {
+        const output: GearOutput | undefined = this.outputs_.find((o: GearOutput) => {
+            return o.getId() === outputPortId;
+        });
+        if (output == undefined) {
+            console.error("output port not found", outputPortId);
+            return undefined;
+        }
+        const buffer: Buffer = Buffer.alloc(10);
+        buffer.fill(0);
+        buffer[0] = this.REQUEST_CHANGE_STATUS;
+        buffer[1] = 1 << this.id_;
+        buffer[2] = (1 & status) << this.id_;
+        return buffer;
+
+
+    };
+};
+
+interface IGearGene {
+    makeInstance: (id: number) => IGear;
+};
+class TestGearGene implements IGearGene {
+    makeInstance: () => IGear = (): IGear => {
+        return new TestGear();
+    }
+};
+class Button3GearGene implements IGearGene {
+    makeInstance: (id: number) => IGear = (id: number): IGear => {
+        return new Button3Gear(id);
+    }
+};
+const GearGenes: IGearGene[] = [new TestGearGene(), new Button3GearGene()];
+
+
+let gearIdGenerator: number = 0;
+class Gear {
+    private readonly tempId_: number;
+    private readonly conn_: net.Socket;
+    private readonly parser_: RompParser;
+    private readonly inetAddress_: string;
+    private chipId_: number = -1;
+    private gear_: IGear | undefined = undefined;
+    private readonly packetBuffer_: Buffer;
+    private packetSeq_: number;
+
+
+    constructor(conn: net.Socket) {
+        this.tempId_ = gearIdGenerator;
+        this.conn_ = conn;
+        this.parser_ = new RompParser();
+        this.inetAddress_ = conn.remoteAddress + ':' + conn.remotePort
+
+        // romp encoder
+        this.packetBuffer_ = Buffer.alloc(20);
+        this.packetSeq_ = 0;
+
+        gearIdGenerator++;
+        this.parser_.onNewPacket(this.onNewPacket);
+        this.conn_.on("data", this.parser_.parse);
+
+        this.packetBuffer_.write("A5", 0, 2, "ascii");
+        this.packetBuffer_[2] = 0x01;
+
+    }
+
+    private readonly onNewPacket = (packet: RompPacket): void => {
+        this.chipId_ = packet.chipId;
+        this.getGearInstance(packet.gearType).handlePacket(packet.packetType, packet.payload);
+    }
+
+    private readonly getGearInstance = (gearType: number): IGear => {
+        if (this.gear_ === undefined) {
+            this.gear_ = GearGenes[gearType].makeInstance(this.chipId_);
+        }
+        return this.gear_;
+    }
+    readonly getTempId = (): number => { return this.tempId_; }
+    readonly getChipId = (): number => { return this.chipId_; }
+    readonly setOutput = (outputId: number, status: number) => {
+        const buffer: Buffer | undefined = this.gear_?.generateOutputPayload(outputId, status);
+        if (buffer === undefined) {
+            console.error("CANNot request, bad input");
+        } else {
+            this.packetBuffer_.writeUint32LE(this.chipId_, 3);
+            this.packetBuffer_[8] = this.packetSeq_;
+            this.packetSeq_++;
+            this.packetSeq_ = this.packetSeq_ & 0x00FF;
+            this.packetBuffer_[9] = PACKET_TYPE_REQUEST_GEAR;
+            buffer.copy(this.packetBuffer_, 10, 0, 10);
+            console.log(buffer);
+            console.log(this.packetBuffer_.length, this.packetBuffer_);
+            this.conn_.write(this.packetBuffer_, (err: Error | undefined) => {
+                console.log("Send OK? ", err);
+            });
+        }
+
+    }
+};
 
 class ClientPool {
     // connection list
 
     // gear list
+    private gearList_: Gear[] = [];
 
 
     constructor() {
+
+    }
+
+    private readonly removeGearByTempId = (tempId: number): void => {
+        let index: number = -1;
+        this.gearList_.forEach((gear: Gear, idx: number) => {
+            if (gear.getTempId() == tempId) {
+                index = idx;
+            }
+        });
+        if (index >= 0) {
+            console.log("ready to remove the element @", index);
+            this.gearList_.splice(index, 1);
+        }
 
     }
 
     readonly add = (conn: net.Socket): void => {
         // Because the heartbeat interval is 2000, so set the timeout to 5000
         conn.setTimeout(5000);
+        const gear: Gear = new Gear(conn);
+        this.gearList_.push(gear);
 
         const remoteAddress: string = conn.remoteAddress + ':' + conn.remotePort;
         conn.on("close", (hadError: boolean): void => {
             if (hadError) {
-                console.log("Client " + remoteAddress + " closed with Error");
+                console.log("Client " + gear.getTempId() + " " + remoteAddress + " closed with Error");
             } else {
-                console.log("Client " + remoteAddress + " closed without Error");
+                console.log("Client " + gear.getTempId() + " " + remoteAddress + " closed without Error");
             }
-            // TODO: remove client from pool
-            console.log("TODO");
+            this.removeGearByTempId(gear.getTempId());
         });
 
         conn.on("end", (): void => {
-            console.log("Client " + remoteAddress + " end");
+            console.log("Client " + gear.getTempId() + " " + remoteAddress + " end");
         });
 
         conn.on("error", (): void => {
-            console.log("Client " + remoteAddress + " error");
+            console.log("Client " + gear.getTempId() + " " + remoteAddress + " error");
         });
 
         conn.on("timeout", (): void => {
-            console.log("Client " + remoteAddress + " timeout");
+            console.log("Client " + gear.getTempId() + " " + remoteAddress + " timeout");
             // If the timeout occur, kill this client
             conn.destroy();
         });
+    }
 
-        conn.on("data", (data: Buffer): void => {
-            console.log("Client " + remoteAddress + " data", data);
+
+    readonly requestOutput = (gearId: number, outputId: number, status: number): void => {
+        // Find the gear 
+        const gear: Gear | undefined = this.gearList_.find((gear: Gear) => {
+            return gear.getChipId() === gearId;
         });
+        if (gear === undefined) {
+            console.log("TODO: add callback to tell failed");
+        } else {
+            gear.setOutput(outputId, status);
 
-
+        }
 
     }
 };
 
+const clientPool_ = new ClientPool();
+
 class RompServer {
     private readonly server_: net.Server;
-    private readonly clientPool_: ClientPool;
 
     constructor() {
         this.server_ = net.createServer();
-        this.clientPool_ = new ClientPool();
+
 
         // setup Server
         this.server_.on("close", (): void => {
@@ -79,7 +319,7 @@ class RompServer {
     private readonly onNewClient = (conn: net.Socket): void => {
         const remoteAddress: string = conn.remoteAddress + ':' + conn.remotePort;
         console.log("client come", remoteAddress);
-        this.clientPool_.add(conn);
+        clientPool_.add(conn);
     }
 
     readonly begin = (): void => {
@@ -116,3 +356,77 @@ class RompServer {
 
 const server = new RompServer();
 server.begin();
+
+
+
+// Central Manager
+
+// A map
+/**
+ * Gear pool 
+ *  - Gear chip id
+ *  - Gear button information ...
+ * 
+ * Virtual Device 
+ *  e.g. The light 
+ * 
+ * 
+ * The light -- mapping to --> the Relay on one gear
+ * 
+ * 1. Need a representation of the physical device
+ * 2. Need a representation of Gear device
+ * 
+ * 
+ * 
+ */
+
+const TwoFloorLivingLight = {
+    // light
+
+    // Output:
+    gearId: 2090368,
+    outputId: 0,
+};
+
+// ======== Express
+
+const app = express();
+
+app.get("/on_gear", (req: express.Request, res: express.Response): void => {
+
+    console.log(req.query["gearid"]);
+    console.log(req.query["portid"]);
+    res.send("hello world")
+
+});
+
+//http://localhost:3000/control?id=0&status=1
+app.get("/control", (req: express.Request, res: express.Response): void => {
+
+    const deviceId: number = Number(req.query["id"]);
+    const statusStr: string = String(req.query["status"]);
+    const status: boolean = (statusStr === "on") || (statusStr === "1");
+
+    // the mock mapping
+    const mapping = [{
+        deviceId: 0,
+        gearId: 2090368,
+        outputId: 0,
+    }];
+
+
+
+    if (!isNaN(deviceId)) {
+        const matchedDevice = mapping.find((rule) => {
+            return rule.deviceId === deviceId;
+        });
+        if (matchedDevice != undefined) {
+            clientPool_.requestOutput(matchedDevice.gearId, matchedDevice.outputId, status ? 1 : 0);
+        }
+    }
+});
+
+app.listen(3000, (): void => {
+
+});
+

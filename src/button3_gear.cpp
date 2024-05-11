@@ -94,15 +94,23 @@ void Button3Gear::Button3GearInstance::tick() {
 }
 
 void Button3Gear::Button3GearInstance::fillStatus(std::uint8_t *buffer,
-                                                  std::size_t) const {
+                                                  std::size_t length) const {
+  std::memset(buffer, 0U, length);
   std::uint8_t statusByte{0U};
   for (std::size_t i{0U}; i < buttons_.size(); ++i) {
-    statusByte <<= 1;
     if (buttons_[i].isPushed()) {
-      statusByte |= 1U;
+      statusByte |= (1U << i);
     }
   }
   buffer[0] = statusByte;
+
+  statusByte = 0U;
+  for (std::size_t i{0U}; i < relays_.size(); ++i) {
+    if (relays_[i].isClosed()) {
+      statusByte |= (1U << i);
+    }
+  }
+  buffer[1] = statusByte;
 }
 
 void Button3Gear::Button3GearInstance::onServerRequest(ServerRequest req) {
