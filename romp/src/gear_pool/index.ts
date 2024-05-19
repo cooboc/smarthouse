@@ -74,12 +74,14 @@ interface IGear {
     handlePacket: (packetType: number, payload: Buffer) => void;
     generateOutputPayload: (outputPortId: number, status: number) => Buffer | undefined;
     getOutputStatus: (outputPortId: number) => number;
+    setStatus: (outputPortId: number, status: number) => void;
 };
 
 class TestGear implements IGear {
-    handlePacket = () => { }
-    generateOutputPayload = () => { return undefined; }
-    getOutputStatus = () => { return -1; }
+    readonly handlePacket = () => { }
+    readonly generateOutputPayload = () => { return undefined; }
+    readonly getOutputStatus = () => { return -1; }
+    readonly setStatus: (outputPortId: number, status: number) => void = (outputPortId: number, status: number): void => { };
 }
 
 class Button3Gear implements IGear {
@@ -141,6 +143,16 @@ class Button3Gear implements IGear {
         }
         return go.status;
     }
+
+    readonly setStatus: (outputPortId: number, status: number) => void = (outputPortId: number, status: number): void => {
+        const output: GearOutputType | undefined = this.outputs_.find((o: GearOutputType) => {
+            return o.id === outputPortId;
+        });
+        if (output != undefined) {
+            output.status = status;
+        }
+    };
+
 };
 
 interface IGearGene {
@@ -218,6 +230,9 @@ class Gear {
             console.log(this.packetBuffer_.length, this.packetBuffer_);
             this.conn_.write(this.packetBuffer_, (err: Error | undefined) => {
                 console.log("Send OK? ", err);
+                if (!err) {
+                    (this.gear_ as IGear).setStatus(outputId, status);
+                }
             });
         }
     }
@@ -297,7 +312,6 @@ class ClientPool {
             console.log("TODO: add callback to tell failed");
         } else {
             gear.setOutput(outputId, status);
-
         }
     }
 

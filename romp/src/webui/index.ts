@@ -1,7 +1,10 @@
 import express from "express";
+import cors from "cors";
 import { gearServer } from "../gear_pool";
 import { devicePool, CoobocDeviceListType } from "src/device_manager/device_pool";
 import { deviceManager } from "src/device_manager";
+import * as bodyParser from "body-parser";
+
 
 // ======== Express
 
@@ -89,6 +92,8 @@ type CoobocGearOutput = {
 
 
 const apiRouter: express.Router = express.Router();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json())
 apiRouter.get("/devices", (req: express.Request, resp: express.Response) => {
     resp.setHeader('Content-Type', 'application/json');
     resp.end(JSON.stringify(devicePool.getDeviceList()));
@@ -101,7 +106,18 @@ apiRouter.get("/detailed_devices", (req: express.Request, resp: express.Response
     resp.end(JSON.stringify(deviceManager.getDeviceGearMapping()));
 });
 
-app.use("/api", apiRouter);
+type UpdateDeviceStatusType = {
+    deviceId: number,
+    status: number
+}
+
+apiRouter.post("/device_status", (req: express.Request, resp: express.Response) => {
+    const data: UpdateDeviceStatusType = req.body as UpdateDeviceStatusType;
+    deviceManager.udpateDeviceStatus(data.deviceId, data.status);
+    resp.status(200).send("OK");
+})
+
+app.use("/api", cors(), apiRouter);
 
 
 class WebServer {

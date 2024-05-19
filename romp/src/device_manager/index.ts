@@ -43,6 +43,9 @@ class DeviceManager {
             [5, { gearId: 1010196, portId: 2 }],// 楼梯灯
             [6, { gearId: 3288695, portId: 0 }],// 卧室主灯
             [7, { gearId: 3288695, portId: 1 }],// 卧室灯带
+            [8, { gearId: 2664687, portId: 0 }],// 书房走廊
+            [9, { gearId: 2664687, portId: 1 }],// 9
+            [10, { gearId: 2664687, portId: 2 }],// 8
 
         ]);
     }
@@ -55,7 +58,6 @@ class DeviceManager {
                 console.error("device not found in mapping", key);
             } else {
                 let status: number | undefined = gearServer.getGearPortStatus(value.gearId, value.portId);
-                console.log(status);
                 if (status === undefined) {
                     status = -1;
                 }
@@ -64,12 +66,18 @@ class DeviceManager {
                     gearPort: value,
                     status: status
                 }
-                console.log("status ", status);
                 ret.push(item);
             }
         });
 
         return ret;
+    }
+
+    readonly udpateDeviceStatus = (deviceId: DeviceIdType, status: number): void => {
+        if (this.deviceGearMap_.has(deviceId)) {
+            const gearPort: GearPortType = this.deviceGearMap_.get(deviceId) as GearPortType;
+            gearServer.requestOutput(gearPort.gearId, gearPort.portId, status);
+        }
     }
 };
 
