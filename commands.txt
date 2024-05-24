@@ -18,3 +18,7 @@ arduino-cli monitor -p COM13 --config baudrate=115200
 
 arduino-cli.exe upload --fqbn esp8266:esp8266:generic --protocol network --port "10.1.99.75" --input-dir .cache src
 
+
+arduino-cli compile --verbose --build-cache-path .cache --build-path .cache --fqbn esp8266:esp8266:generic gp
+arduino-cli upload -p COM4 --input-dir .cache --fqbn esp8266:esp8266:generic gp
+arduino-cli monitor -p COM4 --config baudrate=115200

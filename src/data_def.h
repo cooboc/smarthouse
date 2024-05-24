@@ -13,7 +13,7 @@ constexpr std::uint16_t WEB_PORT{80U};
 constexpr std::uint16_t DNS_PORT{53};
 
 // Change this value if you want to invalidate Flash
-constexpr std::uint8_t CLEAN_FLASH_VALUE{8U};
+constexpr std::uint8_t CLEAN_FLASH_VALUE{1U};
 
 struct Persistent {
   char wifiSsid[64] = {0};
@@ -22,7 +22,7 @@ struct Persistent {
   std::uint8_t gearTypeId{-1};
   std::uint8_t gearConfig[64] = {0};
 
-  std::uint8_t dirty = 1U; // The data field used to invalidate data in Flash
+  std::uint8_t dirty = 0U; // The data field used to invalidate data in Flash
   std::uint16_t crc = 32U;
 
   void reset() {

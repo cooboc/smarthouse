@@ -1,6 +1,7 @@
 #include "configuration.h"
 #include "button3_gear.h"
 #include "data_def.h"
+#include "kitchen_gear.h"
 #include "test_gear.h"
 #include "utils.h"
 #include <Arduino.h>
@@ -34,7 +35,8 @@ constexpr std::size_t PERSISTENT_LENGTH = sizeof(Persistent);
 } // namespace
 
 Configuration::Configuration()
-    : gearList_{new TestGear(), new Button3Gear()}, gearInstance_{nullptr} {}
+    : gearList_{new TestGear(), new Button3Gear(), new KitchenGear()},
+      gearInstance_{nullptr} {}
 void Configuration::begin() {
   debugPrintGears();
   deviceId_ = ESP.getChipId();
@@ -57,9 +59,9 @@ void Configuration::begin() {
     std::strcpy(persistent_.wifiSsid, "astrolek");
     std::strcpy(persistent_.wifiPassword, "rootroot");
     std::strcpy(persistent_.serverAddr, "10.1.99.60");
-    persistent_.gearTypeId = 1U; // set to 3 button
+    persistent_.gearTypeId = 2U; // set to 3 button
     // persistent_.gearConfig[0] = 3U; // connect button 0 & 1
-    persistent_.gearConfig[0] = 7U; // connect button 0 & 1 & 2
+    persistent_.gearConfig[0] = 3U; // connect button 0 & 1
     writeToEEPROM();
   } else {
     Serial.println("EEPROM good!");

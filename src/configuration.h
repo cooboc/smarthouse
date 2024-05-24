@@ -48,7 +48,7 @@ private:
   char selfApName_[12]; //"csg-[6]", csg-123456;
 
   Persistent persistent_;
-  std::array<const IGear *, 2U> gearList_;
+  std::array<const IGear *, 3U> gearList_;
   IGearInstance *gearInstance_;
   bool readFromEEPROM();
   void writeToEEPROM();

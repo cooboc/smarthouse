@@ -30,6 +30,7 @@ void setup() {
   }
 
   // hal.setup();
+  Serial.println("Initialization done.");
   sm.begin();
 }
 

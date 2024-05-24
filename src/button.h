@@ -26,6 +26,7 @@ public:
     restartCallback_ = callback;
   }
   void onResetSatified(EventCallback callback) { resetCallback_ = callback; }
+  std::uint8_t getPin() const { return pin_; }
 
 private:
   std::uint8_t pin_;
