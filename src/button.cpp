@@ -8,6 +8,14 @@ constexpr unsigned long CLICK_TIME_THRESHOLD{400U};
 constexpr unsigned long RESTART_TIME_THRESHOLD{15000U};
 constexpr unsigned long RESET_TIME_THRESHOLD{30000U};
 
+Button::Button(const ButtonConfig &cfg)
+    : pin_{cfg.pin}, initValue_{1}, lastValue_{1}, debouncingValue_{1},
+      debouncingTime_{0U}, clickStartTime_{0U}, isRestartTriggered_{false},
+      isResetTriggered_{false}, pushDownCallback_{utils::EMPTY_FUNCTION},
+      pushUpCallback_{utils::EMPTY_FUNCTION},
+      restartCallback_{utils::EMPTY_FUNCTION},
+      resetCallback_{utils::EMPTY_FUNCTION} {}
+
 Button::Button(std::uint8_t pin)
     : pin_{pin}, initValue_{1}, lastValue_{1}, debouncingValue_{1},
       debouncingTime_{0U}, clickStartTime_{0U}, isRestartTriggered_{false},

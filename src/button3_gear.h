@@ -19,12 +19,14 @@ public:
   setupInstance(const std::uint8_t *gearConfig) const override;
 
 private:
-  class Button3GearInstance : public NButtonRelayGearInstance {
-  public:
-    Button3GearInstance(const std::uint8_t *gearConfig)
-        : NButtonRelayGearInstance(gearConfig) {}
-    virtual ~Button3GearInstance() {}
-  };
+  //   class Button3GearInstance : public NButtonRelayGearInstance {
+  //   public:
+  //     Button3GearInstance(const std::uint8_t *gearConfig)
+  //         : NButtonRelayGearInstance(
+  //               gearConfig, {Button{12U}, Button{14U}, Button{5U}},
+  //               {Relay{4U}, Relay{13U}, Relay{15U}}, Led{2U, true}) {}
+  //     virtual ~Button3GearInstance() {}
+  //   };
 };
 } // namespace cooboc
 

@@ -5,12 +5,19 @@
 namespace cooboc {
 
 NButtonRelayGearInstance::NButtonRelayGearInstance(
-    const std::uint8_t *gearConfig)
-    : buttons_{Button{12U}, Button{14U}, Button{5U}},
-      relays_{Relay{4U}, Relay{13U}, Relay{15U}}, leds_{Led{2U, true}},
-      isReadyRestart_{false}, isReadyReset_{false} {
+    const std::uint8_t *gearConfig,
+    const std::vector<ButtonConfig> &buttonsConfig,
+    const std::vector<RelayConfig> &relaysConfig, const Led &&led)
+    : led_{std::move(led)}, isReadyRestart_{false}, isReadyReset_{false} {
   static_assert(sizeof(NButtonRelayGearConfig) <=
                 sizeof(Persistent::gearConfig));
+  for (const auto &bc : buttonsConfig) {
+    buttons_.emplace_back(Button{bc.pin});
+  }
+  for (const auto &rc : relaysConfig) {
+    relays_.emplace_back(Relay{rc});
+  }
+
   memcpy(&config_, gearConfig, sizeof(NButtonRelayGearConfig));
   Serial.print("config = ");
   Serial.println(config_.buttonRelayconnectivity);
@@ -20,7 +27,7 @@ void NButtonRelayGearInstance::setup() {
   Serial.print("NButtonRelayGear connectivity: ");
   Serial.println(static_cast<uint32_t>(config_.buttonRelayconnectivity));
 
-  std::for_each(leds_.begin(), leds_.end(), [](Led &l) { l.setup(); });
+  led_.setup();
   std::for_each(relays_.begin(), relays_.end(), [](Relay &r) { r.setup(); });
 
   for (std::size_t i{0U}; i < buttons_.size(); ++i) {
@@ -28,7 +35,7 @@ void NButtonRelayGearInstance::setup() {
     buttons_[i].onPushDown([this, i]() {
       Serial.print(i);
       Serial.println(" button pushed down");
-      this->leds_[0].set(true);
+      led_.set(true);
       // check connectivity
       if (this->config_.buttonRelayconnectivity & (1 << i)) {
         this->relays_[i].toggle();
@@ -37,26 +44,26 @@ void NButtonRelayGearInstance::setup() {
       userActionPayload_[1] = i;
       userActionCallback_(userActionPayload_);
     });
-    buttons_[i].onPushUp([this, i]() { this->leds_[0].set(false); });
+    buttons_[i].onPushUp([this, i]() { led_.set(false); });
   }
 
   // first button as the restart button
 
   buttons_[0].onRestartSatisfied([this]() {
     Serial.println("Restart Ready.");
-    this->leds_[0].startFastBlink();
+    led_.startFastBlink();
     this->isReadyRestart_ = true;
   });
 
   buttons_[0].onResetSatified([this]() {
     Serial.println("Reset Ready.");
-    this->leds_[0].set(true);
+    led_.set(true);
     this->isReadyRestart_ = false;
     this->isReadyReset_ = true;
   });
 
   buttons_[0].onPushUp([this]() {
-    this->leds_[0].set(false);
+    led_.set(false);
     if (this->isReadyReset_) {
       this->resetPushedCallback_();
       this->isReadyReset_ = false;
@@ -69,7 +76,7 @@ void NButtonRelayGearInstance::setup() {
 }
 
 void NButtonRelayGearInstance::tick() {
-  std::for_each(leds_.begin(), leds_.end(), [](Led &l) { l.tick(); });
+  led_.tick();
   std::for_each(buttons_.begin(), buttons_.end(), [](Button &b) { b.tick(); });
 }
 
@@ -115,7 +122,9 @@ void NButtonRelayGearInstance::onServerRequest(const ServerRequest &req) {
 
 IGearInstance *
 NButtonRelayGear::setupInstance(const std::uint8_t *gearConfig) const {
-  return new NButtonRelayGearInstance(gearConfig);
+  return new NButtonRelayGearInstance(
+      gearConfig, {ButtonConfig{12U}, ButtonConfig{14U}, ButtonConfig{5U}},
+      {RelayConfig{4U}, RelayConfig{13U}, RelayConfig{15U}}, Led{2U, true});
 }
 
 } // namespace cooboc

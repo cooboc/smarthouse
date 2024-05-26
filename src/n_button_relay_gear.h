@@ -5,8 +5,8 @@
 #include "i_gear.h"
 #include "led.h"
 #include "relay.h"
-#include <array>
 #include <functional>
+#include <vector>
 
 namespace cooboc {
 
@@ -21,7 +21,10 @@ public:
 
 class NButtonRelayGearInstance : public IGearInstance {
 public:
-  NButtonRelayGearInstance(const std::uint8_t *gearConfig);
+  NButtonRelayGearInstance(const std::uint8_t *gearConfig,
+                           const std::vector<ButtonConfig> &buttonsConfig,
+                           const std::vector<RelayConfig> &relaysConfig,
+                           const Led &&led);
   virtual void setup() override;
   virtual void tick() override;
   virtual void fillStatus(std::uint8_t *buffer,
@@ -33,9 +36,9 @@ private:
     std::uint8_t buttonRelayconnectivity;
   };
 
-  std::array<Button, 3U> buttons_;
-  std::array<Relay, 3U> relays_;
-  std::array<Led, 1U> leds_;
+  std::vector<Button> buttons_;
+  std::vector<Relay> relays_;
+  Led led_;
   std::uint8_t userActionPayload_[2];
   NButtonRelayGearConfig config_;
   bool isReadyRestart_;

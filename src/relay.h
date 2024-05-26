@@ -4,9 +4,15 @@
 #include <cstdint>
 
 namespace cooboc {
+struct RelayConfig {
+  std::uint8_t pin;
+};
 class Relay {
 public:
+  Relay(const RelayConfig &cfg);
   Relay(std::uint8_t pin);
+  Relay(const Relay &&r);
+
   void setup();
 
   void set(bool status);

@@ -7,10 +7,15 @@
 #include <functional>
 
 namespace cooboc {
+struct ButtonConfig {
+  std::uint8_t pin;
+};
+
 class Button {
 public:
   using EventCallback = std::function<void(void)>;
 
+  Button(const ButtonConfig &cfg);
   Button(std::uint8_t pin);
   Button(const Button &&b);
   Button(const Button &) = delete;

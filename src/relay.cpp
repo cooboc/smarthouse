@@ -3,8 +3,11 @@
 #include <cstdint>
 
 namespace cooboc {
+Relay::Relay(const RelayConfig &cfg) : pin_{cfg.pin}, status_{false} {}
 
 Relay::Relay(std::uint8_t pin) : pin_{pin}, status_{false} {}
+
+Relay::Relay(const Relay &&r) : pin_{r.pin_}, status_{r.status_} {}
 
 void Relay::setup() {
   pinMode(pin_, OUTPUT);
