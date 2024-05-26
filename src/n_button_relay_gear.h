@@ -31,7 +31,7 @@ public:
                           std::size_t length) const override;
   virtual void onServerRequest(const ServerRequest &req) override;
 
-private:
+protected:
   struct NButtonRelayGearConfig {
     std::uint8_t buttonRelayconnectivity;
   };
