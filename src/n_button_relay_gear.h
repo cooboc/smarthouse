@@ -21,6 +21,10 @@ public:
 
 class NButtonRelayGearInstance : public IGearInstance {
 public:
+  enum class UserActionType : std::uint8_t {
+    BUTTON_PUSHED_DOWN = 0,
+  };
+
   NButtonRelayGearInstance(const std::uint8_t *gearConfig,
                            const std::vector<ButtonConfig> &buttonsConfig,
                            const std::vector<RelayConfig> &relaysConfig,
@@ -31,6 +35,9 @@ public:
                           std::size_t length) const override;
   virtual void onServerRequest(const ServerRequest &req) override;
 
+  virtual void sendUserAction(UserActionType type, std::uint8_t value);
+  std::uint8_t makeRelayStatusByte() const;
+
 protected:
   struct NButtonRelayGearConfig {
     std::uint8_t buttonRelayconnectivity;
@@ -39,7 +46,7 @@ protected:
   std::vector<Button> buttons_;
   std::vector<Relay> relays_;
   Led led_;
-  std::uint8_t userActionPayload_[2];
+  std::uint8_t userActionPayload_[10U];
   NButtonRelayGearConfig config_;
   bool isReadyRestart_;
   bool isReadyReset_;

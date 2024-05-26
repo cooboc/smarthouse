@@ -40,9 +40,7 @@ void NButtonRelayGearInstance::setup() {
       if (this->config_.buttonRelayconnectivity & (1 << i)) {
         this->relays_[i].toggle();
       }
-      userActionPayload_[0] = 0;
-      userActionPayload_[1] = i;
-      userActionCallback_(userActionPayload_);
+      sendUserAction(UserActionType::BUTTON_PUSHED_DOWN, i);
     });
     buttons_[i].onPushUp([this, i]() { led_.set(false); });
   }
@@ -90,14 +88,17 @@ void NButtonRelayGearInstance::fillStatus(std::uint8_t *buffer,
     }
   }
   buffer[0] = statusByte;
+  buffer[1] = makeRelayStatusByte();
+}
 
-  statusByte = 0U;
+std::uint8_t NButtonRelayGearInstance::makeRelayStatusByte() const {
+  std::uint8_t statusByte{0U};
   for (std::size_t i{0U}; i < relays_.size(); ++i) {
     if (relays_[i].isClosed()) {
       statusByte |= (1U << i);
     }
   }
-  buffer[1] = statusByte;
+  return statusByte;
 }
 
 void NButtonRelayGearInstance::onServerRequest(const ServerRequest &req) {
@@ -118,6 +119,15 @@ void NButtonRelayGearInstance::onServerRequest(const ServerRequest &req) {
       }
     }
   }
+}
+
+void NButtonRelayGearInstance::sendUserAction(UserActionType type,
+                                              std::uint8_t value) {
+  userActionPayload_[0] =
+      static_cast<std::underlying_type_t<UserActionType>>(type);
+  userActionPayload_[1] = value;
+  userActionPayload_[2] = makeRelayStatusByte();
+  userActionCallback_(userActionPayload_);
 }
 
 IGearInstance *
