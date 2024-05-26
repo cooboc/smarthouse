@@ -4,45 +4,26 @@
 #include "button.h"
 #include "i_gear.h"
 #include "led.h"
+#include "n_button_relay_gear.h"
 #include "relay.h"
 #include <array>
 #include <functional>
 
 namespace cooboc {
-class Button3Gear : public IGear {
+class Button3Gear : public NButtonRelayGear {
 public:
-  Button3Gear();
+  Button3Gear() : NButtonRelayGear() {}
   virtual ~Button3Gear() {}
-  virtual const char *getName() const override;
+  virtual const char *getName() const override { return "3-Button"; }
   virtual IGearInstance *
-  getInstance(const std::uint8_t *gearConfig) const override;
+  setupInstance(const std::uint8_t *gearConfig) const override;
 
 private:
-  class Button3GearInstance : public IGearInstance {
+  class Button3GearInstance : public NButtonRelayGearInstance {
   public:
-    static Button3GearInstance *getInstance(const std::uint8_t *gearConfig);
-
-    virtual void setup() override;
-    virtual void tick() override;
-    virtual void fillStatus(std::uint8_t *buffer,
-                            std::size_t length) const override;
-    virtual void onServerRequest(const ServerRequest &req) override;
-
-  private:
-    struct Button3GearConfig {
-      std::uint8_t buttonRelayconnectivity;
-    };
-
-    std::array<Button, 3U> buttons_;
-    std::array<Relay, 3U> relays_;
-    std::array<Led, 1U> leds_;
-    std::uint8_t userActionPayload_[2];
-    Button3GearConfig config_;
-    bool isReadyRestart_;
-    bool isReadyReset_;
-
-    static Button3GearInstance *instance_;
-    Button3GearInstance(const std::uint8_t *gearConfig);
+    Button3GearInstance(const std::uint8_t *gearConfig)
+        : NButtonRelayGearInstance(gearConfig) {}
+    virtual ~Button3GearInstance() {}
   };
 };
 } // namespace cooboc

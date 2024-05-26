@@ -32,13 +32,15 @@ protected:
 
 class IGear {
 public:
+  IGear() {}
   virtual ~IGear() {}
   virtual const char *getName() const = 0;
 
-  virtual IGearInstance *getInstance(const std::uint8_t *gearConfig) const {
+  virtual IGearInstance *setupInstance(const std::uint8_t *gearConfig) const {
     return nullptr;
-  };
+  }
 };
+
 } // namespace cooboc
 
 #endif

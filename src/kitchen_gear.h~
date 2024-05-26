@@ -14,8 +14,6 @@ public:
   KitchenGear();
   virtual ~KitchenGear() {}
   virtual const char *getName() const override;
-  virtual IGearInstance *
-  getInstance(const std::uint8_t *gearConfig) const override;
 
 private:
   class KitchenGearInstance : public IGearInstance {
