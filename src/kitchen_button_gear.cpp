@@ -20,7 +20,7 @@ void KitchenButtonGear::KitchenButtonGearInstance::setup() {
     const bool isLightOn = relays_[0].isClosed() || relays_[1].isClosed();
     relays_[0].set(!isLightOn);
     relays_[1].set(!isLightOn);
-    // TODO: send user action
+    sendUserAction(UserActionType::BUTTON_PUSHED_DOWN, 2);
   });
 }
 

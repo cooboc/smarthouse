@@ -58,6 +58,14 @@ const coobocDeviceList_: CoobocDeviceListType = [
         id: 10,
         name: "8",
         type: "Light",
+    }, {
+        id: 11,
+        name: "厨房水斗",
+        type: "Light",
+    }, {
+        id: 12,
+        name: "厨房中央",
+        type: "Light",
     },
 ];
 

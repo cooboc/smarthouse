@@ -88,6 +88,7 @@ class Button3Gear implements IGear {
     readonly REQUEST_CHANGE_STATUS: number = 0x01;
 
     readonly USER_ACTION_TYPE: number = 0x00;
+    readonly USER_ACTION_SERVER_REQUEST_OK = 0x01;
 
     private readonly chipId_: number;
     private readonly outputs_: GearOutputType[];
@@ -108,19 +109,27 @@ class Button3Gear implements IGear {
                 break;
             }
             case (PACKET_TYPE_USER_EVENT): {
+
                 const userActionType: number = payload.readUInt8(0);
                 const userActionValue: number = payload.readUint8(1);
                 const relaysStatus: number = payload.readUint8(2);
-                if (userActionType == this.USER_ACTION_TYPE) {
+                if (userActionType === this.USER_ACTION_TYPE) {
                     console.log("PushDown", userActionValue);
                     this.outputs_.forEach((go: GearOutputType) => {
                         const relayStatus: boolean = (relaysStatus & (0x01 << go.id)) !== 0;
                         go.status = relayStatus ? 1 : 0;
                     });
+                } else if (userActionType === this.USER_ACTION_SERVER_REQUEST_OK) {
+                    console.log("REQ_DONE ", userActionValue);
+                    this.outputs_.forEach((go: GearOutputType) => {
+                        const relayStatus: boolean = (relaysStatus & (0x01 << go.id)) !== 0;
+                        go.status = relayStatus ? 1 : 0;
+                    });
+
                 } else {
                     console.error("unknown user action: ", payload);
                 }
-                break;
+
             }
             default: {
                 console.error("unknown packet type", packetType);
@@ -182,7 +191,7 @@ class Button3GearGene implements IGearGene {
         return new Button3Gear(id);
     }
 };
-const GearGenes: IGearGene[] = [new TestGearGene(), new Button3GearGene()];
+const GearGenes: IGearGene[] = [new TestGearGene(), new Button3GearGene(), new Button3GearGene()];
 
 
 let gearIdGenerator: number = 0;

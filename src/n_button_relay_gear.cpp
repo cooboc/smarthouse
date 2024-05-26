@@ -118,6 +118,7 @@ void NButtonRelayGearInstance::onServerRequest(const ServerRequest &req) {
         Serial.println((int)status);
       }
     }
+    sendUserAction(UserActionType::SERVER_REQUEST_OK, makeRelayStatusByte());
   }
 }
 

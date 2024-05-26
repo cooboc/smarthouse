@@ -46,6 +46,8 @@ class DeviceManager {
             [8, { gearId: 2664687, portId: 0 }],// 书房走廊
             [9, { gearId: 2664687, portId: 1 }],// 9
             [10, { gearId: 2664687, portId: 2 }],// 8
+            [11, { gearId: 7765413, portId: 0 }],// 厨房水斗
+            [12, { gearId: 7765413, portId: 1 }],// 厨房中央
 
         ]);
     }

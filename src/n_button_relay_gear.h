@@ -23,6 +23,7 @@ class NButtonRelayGearInstance : public IGearInstance {
 public:
   enum class UserActionType : std::uint8_t {
     BUTTON_PUSHED_DOWN = 0,
+    SERVER_REQUEST_OK = 1,
   };
 
   NButtonRelayGearInstance(const std::uint8_t *gearConfig,
