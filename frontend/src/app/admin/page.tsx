@@ -25,13 +25,13 @@ type DeviceStatusType = {
 };
 
 const fetchDetailedDeviceList = async function (callback: (data: DeviceStatusType[]) => void) {
-    const response = await axios.get("http://10.1.99.60:3000/api/detailed_devices");
+    const response = await axios.get(process.env.ROMP_HOST + ":3000/api/detailed_devices");
     const data = await response.data;
     callback(data);
 }
 
 const updateDeviceStatus = async function (req: any) {
-    await axios.post("http://10.1.99.60:3000/api/device_status", req);
+    await axios.post(process.env.ROMP_HOST + ":3000/api/device_status", req);
 }
 
 
