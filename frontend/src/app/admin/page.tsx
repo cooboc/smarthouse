@@ -24,14 +24,19 @@ type DeviceStatusType = {
     status: number
 };
 
+
+console.log("HOST: ", process.env.ROMP_HOST);
+const host:string = process.env.ROMP_HOST;
+console.log("host: ", host);
+
 const fetchDetailedDeviceList = async function (callback: (data: DeviceStatusType[]) => void) {
-    const response = await axios.get(process.env.ROMP_HOST + ":3000/api/detailed_devices");
+    const response = await axios.get("http://10.1.5.5:3000/api/detailed_devices");
     const data = await response.data;
     callback(data);
 }
 
 const updateDeviceStatus = async function (req: any) {
-    await axios.post(process.env.ROMP_HOST + ":3000/api/device_status", req);
+    await axios.post("http://10.1.5.5:3000/api/device_status", req);
 }
 
 
