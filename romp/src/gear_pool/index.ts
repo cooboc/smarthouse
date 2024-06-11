@@ -181,15 +181,22 @@ class Button3Gear implements IGear {
 
 interface IGearGene {
     makeInstance: (id: number) => IGear;
+    getName: () => string
 };
 class TestGearGene implements IGearGene {
     makeInstance: () => IGear = (): IGear => {
         return new TestGear();
     }
+    getName: () => string = (): string => {
+        return "Test";
+    }
 };
 class Button3GearGene implements IGearGene {
     makeInstance: (id: number) => IGear = (id: number): IGear => {
         return new Button3Gear(id);
+    }
+    getName: () => string = (): string => {
+        return "3-Button";
     }
 };
 const GearGenes: IGearGene[] = [new TestGearGene(), new Button3GearGene(), new Button3GearGene()];
@@ -205,6 +212,7 @@ class Gear {
     private gear_: IGear | undefined = undefined;
     private readonly packetBuffer_: Buffer;
     private packetSeq_: number;
+    private gearType_: number | undefined = undefined;
 
 
     constructor(conn: net.Socket) {
@@ -229,15 +237,17 @@ class Gear {
 
     private readonly onNewPacket = (packet: RompPacket): void => {
         this.chipId_ = packet.chipId;
-        this.getGearInstance(packet.gearType).handlePacket(packet.packetType, packet.payload);
+        if (this.gearType_ === undefined) {
+            this.gearType_ = packet.gearType;
+            this.gear_ = GearGenes[packet.gearType].makeInstance(this.chipId_);
+        } else {
+            if (this.gearType_ != packet.gearType) {
+                console.error("Gear Type changed!, ", this.gearType_, packet.gearType);
+            }
+        }
+        (this.gear_ as IGear).handlePacket(packet.packetType, packet.payload);
     }
 
-    private readonly getGearInstance = (gearType: number): IGear => {
-        if (this.gear_ === undefined) {
-            this.gear_ = GearGenes[gearType].makeInstance(this.chipId_);
-        }
-        return this.gear_;
-    }
     readonly getTempId = (): number => { return this.tempId_; }
     readonly getChipId = (): number => { return this.chipId_; }
     readonly getRemoteAddress = (): string => { return this.inetAddress_; }
@@ -268,6 +278,10 @@ class Gear {
         } else {
             return undefined;
         }
+    }
+
+    readonly getType = (): number | undefined => {
+        return this.gearType_;
     }
 
 };
@@ -357,14 +371,25 @@ class ClientPool {
         const ret: GearViewList = this.gearList_.map((gear: Gear): GearView => {
             return {
                 "remote": gear.getRemoteAddress(),
-                "chipId": gear.getChipId()
+                "chipId": gear.getChipId(),
+                "type": gear.getType(),
+                "typeName": gear.getType() ? GearGenes[gear.getType() as number].getName() : undefined
             }
         });
         return ret;
     }
 };
 
-export const clientPool_ = new ClientPool();
+const clientPool_ = new ClientPool();
+
+
+// ClientPoolViewer only exports the readonly interface that not change the clientpool
+class ClientPoolViewer {
+    readonly getGearViewList = clientPool_.getGearViewList;
+};
+
+export const clientPoolViewer = new ClientPoolViewer();
+
 
 class RompServer {
     private readonly server_: net.Server;
