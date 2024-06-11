@@ -26,7 +26,7 @@ type DeviceStatusType = {
 
 
 console.log("HOST: ", process.env.ROMP_HOST);
-const host:string = process.env.ROMP_HOST;
+const host: string = process.env.ROMP_HOST as string;
 console.log("host: ", host);
 
 const fetchDetailedDeviceList = async function (callback: (data: DeviceStatusType[]) => void) {

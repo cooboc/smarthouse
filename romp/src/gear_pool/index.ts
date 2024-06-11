@@ -1,4 +1,5 @@
 import * as net from 'net';
+import { GearView, GearViewList } from 'src/common/datadef';
 
 
 class Light {
@@ -212,6 +213,7 @@ class Gear {
         this.parser_ = new RompParser();
         this.inetAddress_ = conn.remoteAddress + ':' + conn.remotePort
 
+
         // romp encoder
         this.packetBuffer_ = Buffer.alloc(20);
         this.packetSeq_ = 0;
@@ -238,6 +240,7 @@ class Gear {
     }
     readonly getTempId = (): number => { return this.tempId_; }
     readonly getChipId = (): number => { return this.chipId_; }
+    readonly getRemoteAddress = (): string => { return this.inetAddress_; }
     readonly setOutput = (outputId: number, status: number) => {
         const buffer: Buffer | undefined = this.gear_?.generateOutputPayload(outputId, status);
         if (buffer === undefined) {
@@ -265,8 +268,8 @@ class Gear {
         } else {
             return undefined;
         }
-
     }
+
 };
 
 class ClientPool {
@@ -348,10 +351,20 @@ class ClientPool {
         } else {
             return gear.getOutputStatus(outputId);
         }
+    };
+
+    readonly getGearViewList = (): GearViewList => {
+        const ret: GearViewList = this.gearList_.map((gear: Gear): GearView => {
+            return {
+                "remote": gear.getRemoteAddress(),
+                "chipId": gear.getChipId()
+            }
+        });
+        return ret;
     }
 };
 
-const clientPool_ = new ClientPool();
+export const clientPool_ = new ClientPool();
 
 class RompServer {
     private readonly server_: net.Server;

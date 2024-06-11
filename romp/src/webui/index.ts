@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { gearServer } from "../gear_pool";
+import { clientPool_, gearServer } from "../gear_pool";
 import { devicePool, CoobocDeviceListType } from "src/device_manager/device_pool";
 import { deviceManager } from "src/device_manager";
 import * as bodyParser from "body-parser";
@@ -116,6 +116,11 @@ apiRouter.post("/device_status", (req: express.Request, resp: express.Response) 
     deviceManager.udpateDeviceStatus(data.deviceId, data.status);
     resp.status(200).send("OK");
 })
+
+apiRouter.get("/online_gears", (req: express.Request, resp: express.Response) => {
+    resp.setHeader('Content-Type', 'application/json');
+    resp.end(JSON.stringify(clientPool_.getGearViewList()));
+});
 
 app.use("/api", cors(), apiRouter);
 
