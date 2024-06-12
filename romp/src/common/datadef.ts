@@ -5,4 +5,9 @@ export type GearView = {
     "typeName": string | undefined
 };
 
-export type GearViewList = GearView[];
+export type GearViewListType = GearView[];
+
+export type UpdateGearConfigType = {
+    "chipId": number,
+    "value": string
+};

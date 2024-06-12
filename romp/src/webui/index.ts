@@ -122,6 +122,15 @@ apiRouter.get("/online_gears", (req: express.Request, resp: express.Response) =>
     resp.end(JSON.stringify(clientPoolViewer.getGearViewList()));
 });
 
+
+// TODO: change post to get
+apiRouter.post("/gear_config", (req: express.Request, resp: express.Response) => {
+    const data: UpdateDeviceStatusType = req.body as UpdateDeviceStatusType;
+
+    resp.setHeader('Content-Type', 'application/json');
+    resp.end(JSON.stringify({ "TODO": "TODO" }));
+})
+
 app.use("/api", cors(), apiRouter);
 
 

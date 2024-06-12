@@ -1,5 +1,5 @@
 import * as net from 'net';
-import { GearView, GearViewList } from 'src/common/datadef';
+import { GearView, GearViewListType } from 'src/common/datadef';
 
 
 class Light {
@@ -367,8 +367,8 @@ class ClientPool {
         }
     };
 
-    readonly getGearViewList = (): GearViewList => {
-        const ret: GearViewList = this.gearList_.map((gear: Gear): GearView => {
+    readonly getGearViewList = (): GearViewListType => {
+        const ret: GearViewListType = this.gearList_.map((gear: Gear): GearView => {
             return {
                 "remote": gear.getRemoteAddress(),
                 "chipId": gear.getChipId(),
