@@ -44,8 +44,8 @@ class DeviceManager {
             [6, { gearId: 3288695, portId: 0 }],// 卧室主灯
             [7, { gearId: 3288695, portId: 1 }],// 卧室灯带
             [8, { gearId: 2664687, portId: 0 }],// 书房走廊
-            [9, { gearId: 2664687, portId: 1 }],// 9
-            [10, { gearId: 2664687, portId: 2 }],// 8
+            [9, { gearId: 2664687, portId: 1 }],// 书房9
+            [10, { gearId: 2664687, portId: 2 }],// 书房8
             [11, { gearId: 7765413, portId: 0 }],// 厨房水斗
             [12, { gearId: 7765413, portId: 1 }],// 厨房中央
 
