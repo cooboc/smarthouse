@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "romp"
+		},
+		{
+			"path": "frontend"
+		},
+		{
+			"path": "src"
+		}
+	],
+    "settings": {}
+}
