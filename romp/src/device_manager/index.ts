@@ -48,6 +48,11 @@ class DeviceManager {
             [10, { gearId: 2664687, portId: 2 }],// 书房8
             [11, { gearId: 7765413, portId: 0 }],// 厨房水斗
             [12, { gearId: 7765413, portId: 1 }],// 厨房中央
+            [13, { gearId: 1625651, portId: 0 }],// 1楼客厅主灯
+            [14, { gearId: 1625651, portId: 1 }],// 1楼客厅灯带
+            [15, { gearId: 1625651, portId: 2 }],// 1楼客厅射灯
+            [16, { gearId: 7715225, portId: 0 }],// 玄关
+            [17, { gearId: 7715225, portId: 1 }],// 总控
 
         ]);
     }
