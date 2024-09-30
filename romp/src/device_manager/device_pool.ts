@@ -56,7 +56,7 @@ const coobocDeviceList_: CoobocDeviceListType = [
         type: "Light",
     }, {
         id: 10,
-        name: "8",
+        name: "书房8",
         type: "Light",
     }, {
         id: 11,
