@@ -25,18 +25,32 @@ type DeviceStatusType = {
 };
 
 
-console.log("HOST: ", process.env.ROMP_HOST);
-const host: string = process.env.ROMP_HOST as string;
-console.log("host: ", host);
+let PROD_SERVER:string = "http://10.1.99.60:3000";
+if ((process.env.NODE_ENV as string) === "production") {
+    PROD_SERVER = "http://10.1.5.5:3000";
+}
 
+// let PROD_SERVER = "http://10.1.5.5:3000";
+// if (process.env.ROMP_HOST) {
+//     PROD_SERVER = process.env.ROMP_HOST as string;
+// }
+
+// console.log("process.env.NODE_ENV", process.env.NODE_ENV);
+// console.log("process.env.NEXT_PUBLIC_SERVER", process.env.NEXT_PUBLIC_SERVER);
+
+// console.log("HOST: ", process.env.ROMP_HOST);
+// const host: string = process.env.ROMP_HOST as string;
+// console.log("host: ", host);
+
+// console.log("server = " + PROD_SERVER);
 const fetchDetailedDeviceList = async function (callback: (data: DeviceStatusType[]) => void) {
-    const response = await axios.get("http://10.1.5.5:3000/api/detailed_devices");
+    const response = await axios.get(PROD_SERVER+"/api/detailed_devices");
     const data = await response.data;
     callback(data);
 }
 
 const updateDeviceStatus = async function (req: any) {
-    await axios.post("http://10.1.5.5:3000/api/device_status", req);
+    await axios.post(PROD_SERVER+"/api/device_status", req);
 }
 
 
@@ -65,7 +79,7 @@ export default function Page() {
     });
 
     const deviceList: React.ReactNode[] = deviceListState.map((detailedDevice: DeviceStatusType): ReactNode => {
-
+        
         let variantTxt: "contained" | "outlined" = (detailedDevice.status > 0) ? "contained" : "outlined";
 
         const onclick = (evt: any) => {
