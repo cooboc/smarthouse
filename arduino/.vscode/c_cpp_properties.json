@@ -1,0 +1,76 @@
+{
+    "env": {
+        "myIncludePath": [
+            "${workspaceFolder}",
+        ],
+        "myDefines": [
+            // "MCAP_COMPRESSION_NO_LZ4",
+            // "MCAP_COMPRESSION_NO_ZSTD"
+        ]
+    },
+    "configurations": [
+        {
+            "name": "Linux",
+            "compilerArgs": [],
+            //"intelliSenseMode": "linux-gcc-x86",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/tools/sdk/include",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/tools/sdk/lwip2/include",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/tools/sdk/libc/xtensa-lx106-elf/include",
+                "${workspaceFolder}/.cache/core",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/cores/esp8266",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/variants/generic",
+                "/home/heqichen/Arduino/libraries/ESPAsyncTCP/src",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/libraries/DNSServer/src",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/libraries/ESP8266WiFi/src",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/libraries/ESP8266WebServer/src",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/libraries/EEPROM",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/libraries/ArduinoOTA",
+                "/home/heqichen/.arduino15/packages/esp8266/hardware/esp8266/3.1.2/libraries/ESP8266mDNS/src",
+            ],
+            "defines": [
+                "__ets__",
+                "ICACHE_FLASH",
+                "_GNU_SOURCE",
+                "ESP8266",
+                "MMU_IRAM_SIZE=0x8000",
+                "MMU_ICACHE_SIZE=0x8000",
+                "NONOSDK22x_190703=1",
+                "F_CPU=80000000L",
+                "LWIP_OPEN_SRC",
+                "TCP_MSS=536",
+                "LWIP_FEATURES=1",
+                "LWIP_IPV6=0",
+                "ARDUINO=10607",
+                "ARDUINO_ESP8266_GENERIC",
+                "LED_BUILTIN=2",
+                "FLASHMODE_DOUT"
+                // "MCAP_COMPRESSION_NO_LZ4",
+                // "MCAP_COMPRESSION_NO_ZSTD"
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "forcedInclude": [
+                //"${workspaceFolder}/common.h"
+            ],
+            //"compileCommands": "${workspaceFolder}/build/compile_commands.json",
+            //"dotConfig": "${workspaceFolder}/.config",
+            "mergeConfigurations": true,
+            "customConfigurationVariables": {
+                "myVar": "myvalue"
+            },
+            "browse": {
+                "path": [
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db"
+            },
+            "compilerPath": "/home/heqichen/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/3.1.0-gcc10.3-e5f9fec/bin/xtensa-lx106-elf-g++"
+        }
+    ],
+    "version": 4,
+    "enableConfigurationSquiggles": true
+}

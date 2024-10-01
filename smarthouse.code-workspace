@@ -1,14 +1,89 @@
 {
-	"folders": [
-		{
-			"path": "romp"
-		},
-		{
-			"path": "frontend"
-		},
-		{
-			"path": "src"
-		}
-	],
-    "settings": {}
+    "folders": [
+        {
+            "path": "romp"
+        },
+        {
+            "path": "frontend"
+        },
+        {
+            "path": "arduino"
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "functional": "cpp",
+            "array": "cpp",
+            "compare": "cpp",
+            "cstdint": "cpp",
+            "cstdio": "cpp",
+            "unordered_map": "cpp",
+            "vector": "cpp",
+            "tuple": "cpp",
+            "type_traits": "cpp",
+            "utility": "cpp",
+            "initializer_list": "cpp",
+            "atomic": "cpp",
+            "bit": "cpp",
+            "*.tcc": "cpp",
+            "cctype": "cpp",
+            "clocale": "cpp",
+            "cmath": "cpp",
+            "concepts": "cpp",
+            "condition_variable": "cpp",
+            "cstdarg": "cpp",
+            "cstddef": "cpp",
+            "cstdlib": "cpp",
+            "cstring": "cpp",
+            "ctime": "cpp",
+            "cwchar": "cpp",
+            "cwctype": "cpp",
+            "deque": "cpp",
+            "string": "cpp",
+            "exception": "cpp",
+            "algorithm": "cpp",
+            "iterator": "cpp",
+            "memory": "cpp",
+            "memory_resource": "cpp",
+            "numeric": "cpp",
+            "optional": "cpp",
+            "random": "cpp",
+            "ratio": "cpp",
+            "string_view": "cpp",
+            "system_error": "cpp",
+            "iosfwd": "cpp",
+            "limits": "cpp",
+            "mutex": "cpp",
+            "new": "cpp",
+            "numbers": "cpp",
+            "ostream": "cpp",
+            "semaphore": "cpp",
+            "stdexcept": "cpp",
+            "stop_token": "cpp",
+            "streambuf": "cpp",
+            "thread": "cpp",
+            "typeinfo": "cpp"
+        },
+        "editor.formatOnSave": true,
+        "cSpell.ignorePaths": [
+            "package-lock.json",
+            "node_modules",
+            "vscode-extension",
+            ".git/objects",
+            ".vscode",
+            ".vscode-insiders",
+            ".cache"
+        ],
+        "files.exclude": {
+            ".cache": true
+        },
+        "cSpell.words": [
+            "astrolek",
+            "cooboc",
+            "EEPROM",
+            "FPSTR",
+            "PROGMEM",
+            "Proto"
+        ]
+    }
 }

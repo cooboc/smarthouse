@@ -21,7 +21,7 @@ static const char htmlSetupBody1[] PROGMEM = {
 };
 
 static const char htmlSetupBody2[] PROGMEM = {
-"</b><br><form action='/set' method='POST' id='form'><label for='s'>SSID:</label><input name='s' type='text'><br><label for='w'>Password:</label><input name='w' type='text'><br><label for='h'>Host: </label><input name='h' type='text' maxlength='15'><br><input id='p' type='submit' value='Submit'></form><script lang='text/javascript'>var n,s=['None'"
+"</b><br><form action='/set' method='POST' id='form'><label for='s'>SSID:</label><input name='s' type='text'><br><label for='w'>Password:</label><input name='w' type='text'><br><label for='h'>Host: </label><input name='h' type='text' maxlength='15'><br><label for='c'>Config:</label><input name='c' type='text'><br><input id='p' type='submit' value='Submit'></form><script lang='text/javascript'>var n,s=['None'"
 };
 
 static const char htmlSetupBody3[] PROGMEM = {

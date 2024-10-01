@@ -1,3 +1,4 @@
+
 compile: 
 arduino-cli compile --verbose --fqbn esp8266:esp8266:generic poc\\01-ota\\BasicOTA
 arduino-cli compile --verbose --build-cache-path .cache --build-path .cache --fqbn esp8266:esp8266:generic poc\\01-ota\\BasicOTA
@@ -11,6 +12,11 @@ arduino-cli monitor --port COM3 --config baudrate=115200
 install libarary:
 first, change library.enable_unsafe_install to true in /mnt/c/Users/heqichen/AppData/Local/Arduino15/arduino-cli.yaml, or you won't be able to install any library from git or zip
 arduino-cli lib install --zip-path lib\ESPAsyncTCP-master.zip
+
+Linux: 
+default path for config in Linux: /usr/local/bin/.cli-config.yml
+arduino-cli core install esp8266:esp8266 --config-file ./.cli-config.yml
+ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL=true arduino-cli lib install --zip-path library/ESPAsyncTCP-1.2.4.zip
 
 arduino-cli compile --verbose --build-cache-path .cache --build-path .cache --fqbn esp8266:esp8266:generic src
 arduino-cli upload -p COM13 --input-dir .cache --fqbn esp8266:esp8266:generic src
