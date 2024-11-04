@@ -82,7 +82,27 @@ const coobocDeviceList_: CoobocDeviceListType = [
         id: 16,
         name: "玄关",
         type: "Light",
-    }
+    },
+    {
+        id: 18,
+        name: "TBD-1",
+        type: "Light"
+    },
+    {
+        id: 19,
+        name: "TBD-1",
+        type: "Light"
+    },
+    {
+        id: 20,
+        name: "TBD-1",
+        type: "Light"
+    },
+    {
+        id: 21,
+        name: "TBD-1",
+        type: "Light"
+    },
 ];
 
 class DevicePool {
