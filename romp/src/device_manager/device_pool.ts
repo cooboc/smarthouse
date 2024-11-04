@@ -67,6 +67,10 @@ const coobocDeviceList_: CoobocDeviceListType = [
         name: "厨房中央",
         type: "Light",
     }, {
+        id: 21,
+        name: "餐桌",
+        type: "Light"
+    }, {
         id: 13,
         name: "1楼客厅主灯",
         type: "Light",
@@ -85,24 +89,20 @@ const coobocDeviceList_: CoobocDeviceListType = [
     },
     {
         id: 18,
-        name: "TBD-1",
-        type: "Light"
-    },
-    {
-        id: 19,
-        name: "TBD-1",
+        name: "洗手台",
         type: "Light"
     },
     {
         id: 20,
-        name: "TBD-1",
+        name: "1楼卫生间",
         type: "Light"
     },
     {
-        id: 21,
-        name: "TBD-1",
+        id: 19,
+        name: "2楼卫生间",
         type: "Light"
     },
+
 ];
 
 class DevicePool {

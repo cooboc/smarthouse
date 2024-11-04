@@ -53,10 +53,10 @@ class DeviceManager {
             [15, { gearId: 1625651, portId: 2 }],// 1楼客厅射灯
             [16, { gearId: 7715225, portId: 0 }],// 玄关
             [17, { gearId: 7715225, portId: 1 }],// 总控
-            [18, { gearId: 10723009, portId: 0 }],// 总控
-            [19, { gearId: 4540192, portId: 0 }],// 总控
-            [20, { gearId: 1274974, portId: 0 }],// 总控
-            [21, { gearId: 2171058, portId: 0 }],// 总控
+            [18, { gearId: 10723009, portId: 0 }],// 洗手台
+            [19, { gearId: 4540192, portId: 0 }],// 2楼卫生间
+            [20, { gearId: 1274974, portId: 0 }],// 1楼卫生间
+            [21, { gearId: 2171058, portId: 2 }],// 餐桌
 
 
         ]);
