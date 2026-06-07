@@ -1,0 +1,1 @@
+(venv)python app.py to control the hue device

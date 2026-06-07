@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hue 控制台</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 24px;
+            color: #f5c518;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #0f3460;
+            transition: box-shadow 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .badge {
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-on {
+            background: #f5c518;
+            color: #1a1a2e;
+        }
+
+        .badge-off {
+            background: #333;
+            color: #888;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .row label {
+            min-width: 60px;
+            font-size: 0.82rem;
+            color: #aaa;
+        }
+
+        input[type=range] {
+            flex: 1;
+            accent-color: #f5c518;
+        }
+
+        input[type=number] {
+            width: 60px;
+            background: #0f3460;
+            border: 1px solid #1a4a8a;
+            color: #e0e0e0;
+            border-radius: 6px;
+            padding: 3px 6px;
+            font-size: 0.85rem;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        button {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: opacity 0.15s;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .btn-on {
+            background: #f5c518;
+            color: #1a1a2e;
+        }
+
+        .btn-off {
+            background: #333;
+            color: #e0e0e0;
+        }
+
+        .mode-toggle {
+            display: flex;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #1a4a8a;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 6px;
+            border-radius: 0;
+            background: #0f3460;
+            color: #888;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            border: none;
+            margin: 0;
+        }
+
+        .mode-btn.active {
+            background: #1a4a8a;
+            color: #f5c518;
+        }
+
+        .mode-btn:hover:not(.active) {
+            color: #e0e0e0;
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-row label {
+            min-width: 60px;
+            font-size: 0.82rem;
+            color: #aaa;
+        }
+
+        input[type=color] {
+            width: 40px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: none;
+            padding: 0;
+        }
+
+        .swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #444;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .meta {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+
+        #error {
+            color: #e55;
+            padding: 20px;
+            background: #300;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .section {
+            margin-bottom: 36px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>💡 Hue 控制台</h1>
+    <div id="error"></div>
+    <div id="loading">加载中…</div>
+    <div id="app" style="display:none">
+        <div class="section">
+            <h2>灯光</h2>
+            <div class="grid" id="lights-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        const api = path => fetch(path).then(r => r.json());
+        const apiPut = (path, body) => fetch(path, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(r => r.json());
+
+        // CIE XY + bri → hex (Philips wide-gamut D65 matrix)
+        function xyToHex(x, y, bri = 254) {
+            const Y = bri / 254;
+            const X = y === 0 ? 0 : (Y / y) * x;
+            const Z = y === 0 ? 0 : (Y / y) * (1 - x - y);
+            let r = X * 1.656492 - Y * 0.354851 - Z * 0.255038;
+            let g = -X * 0.707196 + Y * 1.655397 + Z * 0.036152;
+            let b = X * 0.051713 - Y * 0.121364 + Z * 1.011530;
+            [r, g, b] = [r, g, b].map(v => Math.max(0, v));
+            const maxVal = Math.max(r, g, b, 1);
+            [r, g, b] = [r / maxVal, g / maxVal, b / maxVal];
+            const gamma = v => v <= 0.0031308 ? 12.92 * v : (1 + 0.055) * Math.pow(v, 1 / 2.4) - 0.055;
+            [r, g, b] = [r, g, b].map(gamma);
+            const toHex = n => Math.round(Math.max(0, Math.min(1, n)) * 255).toString(16).padStart(2, '0');
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+
+        // hex → CIE XY (sRGB → wide-gamut D65)
+        function hexToXy(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255;
+            let g = parseInt(hex.slice(3, 5), 16) / 255;
+            let b = parseInt(hex.slice(5, 7), 16) / 255;
+            const linear = v => v > 0.04045 ? Math.pow((v + 0.055) / 1.055, 2.4) : v / 12.92;
+            [r, g, b] = [r, g, b].map(linear);
+            const X = r * 0.664511 + g * 0.154324 + b * 0.162028;
+            const Y = r * 0.283881 + g * 0.668433 + b * 0.047685;
+            const Z = r * 0.000088 + g * 0.072310 + b * 0.986039;
+            const sum = X + Y + Z;
+            if (sum === 0) return [0.3127, 0.3290]; // D65 white point
+            return [X / sum, Y / sum];
+        }
+
+        const lightModes = {}; // 'color' | 'ct' per light id
+
+        function setMode(id, mode) {
+            lightModes[id] = mode;
+            const colorSec = document.getElementById(`color-section-${id}`);
+            const ctSec = document.getElementById(`ct-section-${id}`);
+            const btnColor = document.getElementById(`mode-color-${id}`);
+            const btnCt = document.getElementById(`mode-ct-${id}`);
+            if (colorSec) colorSec.style.display = mode === 'color' ? '' : 'none';
+            if (ctSec) ctSec.style.display = mode === 'ct' ? '' : 'none';
+            if (btnColor) btnColor.classList.toggle('active', mode === 'color');
+            if (btnCt) btnCt.classList.toggle('active', mode === 'ct');
+        }
+
+        function buildLightCard(id, light) {
+            const s = light.state;
+            const isOn = s.on;
+            const bri = s.bri ?? 254;
+            // Determine capabilities from type string (more reliable than checking state fields)
+            const typeStr = (light.type || '').toLowerCase();
+            const hasColor = typeStr.includes('color') && !typeStr.includes('temperature');
+            const hasCt = s.ct != null;
+            const colorHex = hasColor && Array.isArray(s.xy) ? xyToHex(s.xy[0], s.xy[1], bri) : '#ffffff';
+            const initMode = (s.colormode === 'ct' || !hasColor) ? 'ct' : 'color';
+            lightModes[id] = initMode;
+
+            // Build color/CT section HTML
+            let colorCTHTML = '';
+            if (hasColor && hasCt) {
+                colorCTHTML = `
+      <div class="mode-toggle">
+        <button class="mode-btn ${initMode === 'color' ? 'active' : ''}" id="mode-color-${id}">颜色</button>
+        <button class="mode-btn ${initMode === 'ct' ? 'active' : ''}" id="mode-ct-${id}">色温</button>
+      </div>
+      <div id="color-section-${id}" style="${initMode !== 'color' ? 'display:none' : ''}">
+        <div class="color-row">
+          <label>颜色</label>
+          <input type="color" id="color-${id}" value="${colorHex}" />
+        </div>
+      </div>
+      <div id="ct-section-${id}" style="${initMode !== 'ct' ? 'display:none' : ''}">
+        <div class="row">
+          <label>色温</label>
+          <input type="range" id="ct-${id}" min="153" max="500" value="${s.ct}" />
+          <input type="number" id="ct-num-${id}" min="153" max="500" value="${s.ct}" />
+        </div>
+      </div>`;
+            } else if (hasColor) {
+                colorCTHTML = `
+      <div class="color-row">
+        <label>颜色</label>
+        <input type="color" id="color-${id}" value="${colorHex}" />
+      </div>`;
+            } else if (hasCt) {
+                colorCTHTML = `
+      <div class="row">
+        <label>色温</label>
+        <input type="range" id="ct-${id}" min="153" max="500" value="${s.ct}" />
+        <input type="number" id="ct-num-${id}" min="153" max="500" value="${s.ct}" />
+      </div>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `light-${id}`;
+            card.innerHTML = `
+    <div class="card-header">
+      <span class="card-name">${light.name}</span>
+      <span class="badge ${isOn ? 'badge-on' : 'badge-off'}" id="badge-${id}">${isOn ? '开' : '关'}</span>
+    </div>
+    <div class="controls">
+      <div class="btn-row">
+        <button class="btn-on"  onclick="quickOn('${id}')">开灯</button>
+        <button class="btn-off" onclick="quickOff('${id}')">关灯</button>
+      </div>
+      <div class="row">
+        <label>亮度</label>
+        <input type="range" id="bri-${id}" min="1" max="254" value="${bri}" />
+        <input type="number" id="bri-num-${id}" min="1" max="254" value="${bri}" />
+      </div>
+      ${colorCTHTML}
+    </div>
+    <div class="meta">ID: ${id} · ${light.type ?? ''}</div>
+  `;
+
+            // Debounce timer per light
+            const timers = {};
+            const scheduleApply = () => {
+                clearTimeout(timers[id]);
+                timers[id] = setTimeout(() => applyLight(id, hasColor, hasCt), 500);
+            };
+
+            // Sync range <-> number and trigger debounced apply
+            const syncRange = (rangeId, numId) => {
+                const range = card.querySelector(`#${rangeId}`);
+                const num = card.querySelector(`#${numId}`);
+                if (!range || !num) return;
+                range.addEventListener('input', () => { num.value = range.value; scheduleApply(); });
+                num.addEventListener('input', () => { range.value = num.value; scheduleApply(); });
+            };
+            syncRange(`bri-${id}`, `bri-num-${id}`);
+            if (hasCt) syncRange(`ct-${id}`, `ct-num-${id}`);
+            if (hasColor) {
+                const colorInput = card.querySelector(`#color-${id}`);
+                if (colorInput) colorInput.addEventListener('input', scheduleApply);
+            }
+            if (hasColor && hasCt) {
+                card.querySelector(`#mode-color-${id}`).addEventListener('click', () => setMode(id, 'color'));
+                card.querySelector(`#mode-ct-${id}`).addEventListener('click', () => setMode(id, 'ct'));
+            }
+
+            return card;
+        }
+
+        async function quickOn(id) {
+            await apiPut(`/api/lights/${id}/state`, { on: true });
+            updateBadge(id, true);
+        }
+        async function quickOff(id) {
+            await apiPut(`/api/lights/${id}/state`, { on: false });
+            updateBadge(id, false);
+        }
+
+        async function applyLight(id, hasColor, hasCt) {
+            const bri = parseInt(document.getElementById(`bri-${id}`).value);
+            const state = { on: true, bri };
+            const mode = lightModes[id] || (hasColor ? 'color' : 'ct');
+            if (mode === 'color' && hasColor) {
+                state.xy = hexToXy(document.getElementById(`color-${id}`).value);
+            } else if (hasCt) {
+                state.ct = parseInt(document.getElementById(`ct-${id}`).value);
+            }
+            await apiPut(`/api/lights/${id}/state`, state);
+            updateBadge(id, true);
+        }
+
+        function updateBadge(id, on) {
+            const badge = document.getElementById(`badge-${id}`);
+            if (!badge) return;
+            badge.textContent = on ? '开' : '关';
+            badge.className = `badge ${on ? 'badge-on' : 'badge-off'}`;
+        }
+
+        async function loadAll() {
+            try {
+                const lights = await api('/api/lights');
+                const grid = document.getElementById('lights-grid');
+                grid.innerHTML = '';
+                for (const [id, light] of Object.entries(lights)) {
+                    grid.appendChild(buildLightCard(id, light));
+                }
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+            } catch (e) {
+                document.getElementById('loading').style.display = 'none';
+                const err = document.getElementById('error');
+                err.style.display = 'block';
+                err.textContent = '加载失败：' + e.message;
+            }
+        }
+
+        loadAll();
+    </script>
+</body>
+
+</html>
